@@ -2,11 +2,15 @@
 <resources>
 
     <string name="app_name">ExSplit</string>
+    <string name="app_id">654982424611897</string>
     <string name="title_activity_main">MainActivity</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="drawer_open">Open navigation drawer</string>
     <string name="drawer_close">Close navigation drawer</string>
+    <string name="title_activity_login">LoginActivity</string>
+    <string name="title_facebook_login">title_facebook_login</string>
+    <string name="title_activity_create_anew_trip">Create a new trip</string>
 
 </resources>

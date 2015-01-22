@@ -1,6 +1,8 @@
 package fyp.leungww.exsplit;
 
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,10 +19,13 @@ import java.util.List;
 public class DrawerAdapter extends RecyclerView.Adapter<DrawerAdapter.MyViewHolder> {
     private LayoutInflater inflater;
     private List<DrawerInfo> data= Collections.emptyList();
+    private Context context;
+    private ClickListener myClickListener;
 
     public DrawerAdapter(Context context, List<DrawerInfo> data) {
         this.inflater=LayoutInflater.from(context);
         this.data=data;
+        this.context=context;
     }
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -41,7 +46,11 @@ public class DrawerAdapter extends RecyclerView.Adapter<DrawerAdapter.MyViewHold
         return data.size();
     }
 
-    class MyViewHolder extends RecyclerView.ViewHolder {
+    public void setMyClickListener(ClickListener myClickListener){
+        this.myClickListener=myClickListener;
+    }
+
+    class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         TextView title;
         ImageView icon;
 
@@ -49,6 +58,18 @@ public class DrawerAdapter extends RecyclerView.Adapter<DrawerAdapter.MyViewHold
             super(itemView);
             title= (TextView) itemView.findViewById(R.id.drawer_title);
             icon= (ImageView) itemView.findViewById(R.id.drawer_icon);
+            itemView.setOnClickListener(this);
         }
+
+        @Override
+        public void onClick(View v) {
+            if(myClickListener!=null){
+                myClickListener.itemClicked(v,getPosition());
+            }
+        }
+    }
+
+    public interface ClickListener{
+        public void itemClicked(View view, int position);
     }
 }

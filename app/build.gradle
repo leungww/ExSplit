@@ -17,10 +17,21 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    buildscript {
+        repositories {
+            mavenCentral()
+        }
+    }
+}
+
+allprojects {
+    repositories { mavenCentral() }
 }
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:appcompat-v7:21.0.3'
     compile 'com.android.support:recyclerview-v7:21.0.0'
+    compile 'com.facebook.android:facebook-android-sdk:3.22.0'
 }
