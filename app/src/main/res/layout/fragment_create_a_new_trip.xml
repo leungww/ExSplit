@@ -26,10 +26,11 @@
             android:layout_row="0"
             android:gravity="center"
             android:hint="@string/newtrip_name"
-            android:maxLines="1"
+            android:singleLine="true"
+            android:maxLength="29"
             android:textColor="@color/primaryColor"
             android:textColorHint="@color/hintColor"
-            android:textSize="22sp" />
+            android:textSize="18sp" />
 
         <Button
             android:id="@+id/newtrip_save"
@@ -39,7 +40,8 @@
             android:layout_marginTop="@dimen/attribute_margin"
             android:layout_row="0"
             android:text="@string/save"
-            android:textColor="@drawable/button_transition" />
+            android:textColor="@android:color/white"
+            android:background="@color/accentColor"/>
     </GridLayout>
 
     <GridLayout
@@ -56,8 +58,7 @@
             android:layout_marginTop="@dimen/attribute_button_space"
             android:layout_row="0"
             android:text="@string/from"
-            android:textColor="@color/primaryColorLight"
-            android:textSize="18sp" />
+            android:textColor="@color/primaryColorLight" />
 
         <Button
             android:id="@+id/newtrip_from"
@@ -70,8 +71,7 @@
             android:gravity="center"
             android:background="@android:color/white"
             android:text="@string/date_format"
-            android:textColor="@color/hintColor"
-            android:textSize="18sp" />
+            android:textColor="@color/hintColor" />
 
         <TextView
             android:id="@+id/newtrip_text_to"
@@ -81,8 +81,7 @@
             android:layout_marginTop="@dimen/attribute_margin"
             android:layout_row="1"
             android:text="@string/to"
-            android:textColor="@color/primaryColorLight"
-            android:textSize="18sp" />
+            android:textColor="@color/primaryColorLight" />
 
         <Button
             android:id="@+id/newtrip_to"
@@ -95,8 +94,7 @@
             android:gravity="center"
             android:background="@android:color/white"
             android:text="@string/date_format"
-            android:textColor="@color/hintColor"
-            android:textSize="18sp" />
+            android:textColor="@color/hintColor" />
     </GridLayout>
 
     <TextView
@@ -105,8 +103,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/attribute_margin"
         android:text="@string/countries"
-        android:textColor="@color/primaryColorLight"
-        android:textSize="18sp" />
+        android:textColor="@color/primaryColorLight" />
 
     <GridLayout
         android:layout_width="match_parent"
@@ -123,8 +120,7 @@
             android:layout_marginTop="@dimen/attribute_margin"
             android:layout_row="0"
             android:text="@string/canada"
-            android:textColor="@color/primaryColor"
-            android:textSize="18sp" />
+            android:textColor="@color/primaryColor" />
 
         <CheckBox
             android:id="@+id/newtrip_france"
@@ -134,8 +130,7 @@
             android:layout_marginTop="@dimen/attribute_margin"
             android:layout_row="0"
             android:text="@string/france"
-            android:textColor="@color/primaryColor"
-            android:textSize="18sp" />
+            android:textColor="@color/primaryColor" />
 
         <CheckBox
             android:id="@+id/newtrip_uk"
@@ -146,8 +141,7 @@
             android:layout_row="1"
             android:checked="true"
             android:text="@string/uk"
-            android:textColor="@color/primaryColor"
-            android:textSize="18sp" />
+            android:textColor="@color/primaryColor" />
 
         <CheckBox
             android:id="@+id/newtrip_us"
@@ -157,8 +151,7 @@
             android:layout_marginTop="@dimen/attribute_margin"
             android:layout_row="1"
             android:text="@string/us"
-            android:textColor="@color/primaryColor"
-            android:textSize="18sp" />
+            android:textColor="@color/primaryColor" />
     </GridLayout>
 
     <TextView
@@ -166,8 +159,17 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/attribute_margin"
         android:text="@string/travellers"
-        android:textColor="@color/primaryColorLight"
-        android:textSize="18sp" />
+        android:textColor="@color/primaryColorLight" />
+
+    <TextView
+        android:id="@+id/newtrip_traveller"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/attribute_margin"
+        android:gravity="center"
+        android:textColor="@color/primaryColor"
+        android:text="@string/none">
+    </TextView>
 
     <Button
         android:id="@+id/newtrip_add_travellers"
@@ -176,14 +178,8 @@
         android:layout_marginTop="@dimen/attribute_margin"
         android:layout_marginLeft="@dimen/button_margin"
         android:layout_marginRight="@dimen/button_margin"
-        android:text="@string/add_travellers_via_fb"
+        android:text="@string/add_via_fb"
         android:background="@color/com_facebook_blue"
         android:textColor="@android:color/white" />
-
-    <ListView
-        android:id="@+id/traveller_list"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-    </ListView>
 
 </LinearLayout>

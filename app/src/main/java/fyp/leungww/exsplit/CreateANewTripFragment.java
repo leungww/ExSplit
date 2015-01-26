@@ -53,14 +53,9 @@ public class CreateANewTripFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_create_a_new_trip, container, false);
         newtrip_name = (EditText) view.findViewById(R.id.newtrip_name);
-        newtrip_name.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if(!hasFocus){
-                    hideKeyboard();
-                }
-            }
-        });
+        InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(
+                Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(newtrip_name.getWindowToken(), 0);
         newtrip_from = (Button) view.findViewById(R.id.newtrip_from);
         newtrip_from.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -88,11 +83,6 @@ public class CreateANewTripFragment extends Fragment {
             }
         });
         return view;
-    }
-
-    private void hideKeyboard() {
-        InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(newtrip_name.getWindowToken(), 0);
     }
 
     public void showDatePickerDialog(View v) {

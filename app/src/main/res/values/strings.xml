@@ -22,7 +22,8 @@
     <string name="uk">United Kingdom</string>
     <string name="us">United States</string>
     <string name="date_format">Day-Month-Year</string>
-    <string name="add_travellers_via_fb">Add travellers via Facebook</string>
+    <string name="add_via_fb">Add via Facebook</string>
     <string name="save">Save</string>
+    <string name="none">None</string>
 
 </resources>
