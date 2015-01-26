@@ -1,8 +1,6 @@
 package fyp.leungww.exsplit;
 
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,9 +11,6 @@ import android.widget.TextView;
 import java.util.Collections;
 import java.util.List;
 
-/**
- * Created by User on 29/12/2014.
- */
 public class DrawerAdapter extends RecyclerView.Adapter<DrawerAdapter.MyViewHolder> {
     private LayoutInflater inflater;
     private List<DrawerInfo> data= Collections.emptyList();
@@ -30,8 +25,7 @@ public class DrawerAdapter extends RecyclerView.Adapter<DrawerAdapter.MyViewHold
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view=inflater.inflate(R.layout.drawer_row, parent, false);
-        MyViewHolder holder=new MyViewHolder(view);
-        return holder;
+        return new MyViewHolder(view);
     }
 
     @Override

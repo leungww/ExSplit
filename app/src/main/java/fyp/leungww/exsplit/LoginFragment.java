@@ -7,20 +7,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
-import com.facebook.Request;
-import com.facebook.Response;
 import com.facebook.Session;
 import com.facebook.SessionState;
 import com.facebook.UiLifecycleHelper;
-import com.facebook.model.GraphUser;
 import com.facebook.widget.LoginButton;
-import com.facebook.widget.ProfilePictureView;
 
-/**
- * Created by User on 20/1/2015.
- */
+
 public class LoginFragment extends Fragment {
     private static final String TAG = "LoginFragment";
     public static final String[] FB_READ_PERMISSIONS= {"public_profile"};
@@ -56,6 +49,8 @@ public class LoginFragment extends Fragment {
     private void onSessionStateChange(Session session, SessionState state, Exception exception) {
         if (state.isOpened()) {
             Log.i(TAG, "Logged in to Facebook");
+            //getActivity().getSupportFragmentManager().beginTransaction().remove(this).commit();
+            getActivity().finish();
         } else if (state.isClosed()) {
             Log.i(TAG, "Logged out from Facebook");
         }

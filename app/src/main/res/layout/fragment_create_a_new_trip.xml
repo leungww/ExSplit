@@ -1,14 +1,189 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context="fyp.leungww.exsplit.CreateANewTripFragment">
 
-    <!-- TODO: Update blank fragment layout -->
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize" />
+
+    <GridLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:columnCount="2"
+        android:orientation="horizontal"
+        android:rowCount="1">
+
+        <EditText
+            android:id="@+id/newtrip_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_column="0"
+            android:layout_gravity="fill_horizontal"
+            android:layout_marginTop="@dimen/attribute_margin"
+            android:layout_row="0"
+            android:gravity="center"
+            android:hint="@string/newtrip_name"
+            android:maxLines="1"
+            android:textColor="@color/primaryColor"
+            android:textColorHint="@color/hintColor"
+            android:textSize="22sp" />
+
+        <Button
+            android:id="@+id/newtrip_save"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_column="1"
+            android:layout_marginTop="@dimen/attribute_margin"
+            android:layout_row="0"
+            android:text="@string/save"
+            android:textColor="@drawable/button_transition" />
+    </GridLayout>
+
+    <GridLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:columnCount="2"
+        android:orientation="horizontal"
+        android:rowCount="2">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_column="0"
+            android:layout_marginTop="@dimen/attribute_button_space"
+            android:layout_row="0"
+            android:text="@string/from"
+            android:textColor="@color/primaryColorLight"
+            android:textSize="18sp" />
+
+        <Button
+            android:id="@+id/newtrip_from"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_column="1"
+            android:layout_gravity="fill_horizontal"
+            android:layout_marginTop="@dimen/attribute_button_space"
+            android:layout_row="0"
+            android:gravity="center"
+            android:background="@android:color/white"
+            android:text="@string/date_format"
+            android:textColor="@color/hintColor"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/newtrip_text_to"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_column="0"
+            android:layout_marginTop="@dimen/attribute_margin"
+            android:layout_row="1"
+            android:text="@string/to"
+            android:textColor="@color/primaryColorLight"
+            android:textSize="18sp" />
+
+        <Button
+            android:id="@+id/newtrip_to"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_column="1"
+            android:layout_gravity="fill_horizontal"
+            android:layout_marginTop="@dimen/attribute_button_space"
+            android:layout_row="1"
+            android:gravity="center"
+            android:background="@android:color/white"
+            android:text="@string/date_format"
+            android:textColor="@color/hintColor"
+            android:textSize="18sp" />
+    </GridLayout>
+
+    <TextView
+        android:id="@+id/newtrip_text_countries"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/attribute_margin"
+        android:text="@string/countries"
+        android:textColor="@color/primaryColorLight"
+        android:textSize="18sp" />
+
+    <GridLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:columnCount="2"
+        android:orientation="horizontal"
+        android:rowCount="2">
+
+        <CheckBox
+            android:id="@+id/newtrip_canada"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_column="0"
+            android:layout_marginTop="@dimen/attribute_margin"
+            android:layout_row="0"
+            android:text="@string/canada"
+            android:textColor="@color/primaryColor"
+            android:textSize="18sp" />
+
+        <CheckBox
+            android:id="@+id/newtrip_france"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_column="1"
+            android:layout_marginTop="@dimen/attribute_margin"
+            android:layout_row="0"
+            android:text="@string/france"
+            android:textColor="@color/primaryColor"
+            android:textSize="18sp" />
+
+        <CheckBox
+            android:id="@+id/newtrip_uk"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_column="0"
+            android:layout_marginTop="@dimen/attribute_margin"
+            android:layout_row="1"
+            android:checked="true"
+            android:text="@string/uk"
+            android:textColor="@color/primaryColor"
+            android:textSize="18sp" />
+
+        <CheckBox
+            android:id="@+id/newtrip_us"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_column="1"
+            android:layout_marginTop="@dimen/attribute_margin"
+            android:layout_row="1"
+            android:text="@string/us"
+            android:textColor="@color/primaryColor"
+            android:textSize="18sp" />
+    </GridLayout>
+
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/attribute_margin"
+        android:text="@string/travellers"
+        android:textColor="@color/primaryColorLight"
+        android:textSize="18sp" />
 
+    <Button
+        android:id="@+id/newtrip_add_travellers"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/attribute_margin"
+        android:layout_marginLeft="@dimen/button_margin"
+        android:layout_marginRight="@dimen/button_margin"
+        android:text="@string/add_travellers_via_fb"
+        android:background="@color/com_facebook_blue"
+        android:textColor="@android:color/white" />
 
-</FrameLayout>
+    <ListView
+        android:id="@+id/traveller_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+    </ListView>
+
+</LinearLayout>

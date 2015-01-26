@@ -1,8 +1,6 @@
 package fyp.leungww.exsplit;
 
-/**
- * Created by User on 29/12/2014.
- */
+
 public class DrawerInfo {
     private int iconId;
     private String title;

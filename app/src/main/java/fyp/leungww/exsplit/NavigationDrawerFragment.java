@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -161,18 +162,24 @@ public class NavigationDrawerFragment extends Fragment implements DrawerAdapter.
 
     @Override
     public void itemClicked(View view, int position) {
-        mToolbar.setTitle(TITLES[position]);
-        if(position==3) {
-            Session session = Session.getActiveSession();
-            if (session != null && session.isOpened()) {
-                // Get the user's data
-                //startActivity(new Intent(getActivity(), CreateANewTripActivity.class));
-                CreateANewTripFragment createANewTripFragment = new CreateANewTripFragment();
-                getFragmentManager().beginTransaction().replace(android.R.id.content, createANewTripFragment).commit();
-            }else {
-                startActivity(new Intent(getActivity(), LoginActivity.class));
-            }
+        Fragment newFragment;
+        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+
+        switch (position) {
+            case 0:
+                newFragment = new HomeFragment();
+                transaction.replace(R.id.container, newFragment);
+                transaction.addToBackStack(null);
+                transaction.commit();
+                break;
+            case 3:
+                newFragment = new CreateANewTripFragment();
+                transaction.replace(R.id.container, newFragment);
+                transaction.addToBackStack(null);
+                transaction.commit();
+                break;
         }
+        mToolbar.setTitle(TITLES[position]);
         mDrawerLayout.closeDrawer(containerView);
     }
 

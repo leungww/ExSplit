@@ -37,7 +37,7 @@
             android:layout_marginLeft="16dp"
             android:layout_marginTop="16dp"
             android:textColor="@drawable/text_transition"
-            android:text="User" />
+            android:text="@string/username" />
 
     </LinearLayout>
 
