@@ -36,6 +36,7 @@ import java.util.List;
 public class NavigationDrawerFragment extends Fragment implements DrawerAdapter.ClickListener{
     public static final String PREF_FILENAME="testpref";
     public static final String KEY_USER_LEARNED_DRAWER="user_learned_drawer";
+    public static final String KEY_FB_ID="fb_id";
     public static final int[] ICONS={R.drawable.ic_home_white_48dp, R.drawable.ic_note_add_white_48dp, R.drawable.ic_person_white_48dp, R.drawable.ic_event_white_48dp};
     public static final String[] TITLES={"Home", "Add a new bill", "Who's next?", "Create a new trip"};
 
@@ -50,7 +51,7 @@ public class NavigationDrawerFragment extends Fragment implements DrawerAdapter.
     private Session.StatusCallback callback = new Session.StatusCallback() {
         @Override
         public void call(Session session, SessionState state, Exception exception) {
-            onSessionStateChange(session, state, exception);
+        onSessionStateChange(session, state, exception);
         }
     };
     private UiLifecycleHelper uiHelper;
@@ -164,13 +165,16 @@ public class NavigationDrawerFragment extends Fragment implements DrawerAdapter.
     public void itemClicked(View view, int position) {
         Fragment newFragment;
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
-
+        //TODO: destroy current fragment before creating a new one
         switch (position) {
             case 0:
                 newFragment = new HomeFragment();
                 transaction.replace(R.id.container, newFragment);
                 transaction.addToBackStack(null);
                 transaction.commit();
+                break;
+            case 1:
+                startActivity(new Intent(getActivity(), LoginActivity.class));
                 break;
             case 3:
                 newFragment = new CreateANewTripFragment();
@@ -230,25 +234,22 @@ public class NavigationDrawerFragment extends Fragment implements DrawerAdapter.
     private void makeMeRequest(final Session session) {
         // Make an API call to get user data and define a
         // new callback to handle the response.
-        Request request = Request.newMeRequest(session,
-                new Request.GraphUserCallback() {
-                    @Override
-                    public void onCompleted(GraphUser user, Response response) {
-                        // If the response is successful
-                        if (session == Session.getActiveSession()) {
-                            if (user != null) {
-                                // Set the id for the ProfilePictureView
-                                // view that in turn displays the profile picture.
-                                profilePictureView.setProfileId(user.getId());
-                                // Set the Textview's text to the user's name.
-                                userNameView.setText(user.getName());
-                            }
-                        }
-                        if (response.getError() != null) {
-                            // Handle errors, will do so later.
-                        }
+        Request request = Request.newMeRequest(session, new Request.GraphUserCallback() {
+            @Override
+            public void onCompleted(GraphUser user, Response response) {
+                // If the response is successful
+                if (session == Session.getActiveSession()) {
+                    if (user != null) {
+                        profilePictureView.setProfileId(user.getId());
+                        userNameView.setText(user.getName());
+                        //saveToPreferences(getActivity(),KEY_FB_ID, user.getId());
                     }
-                });
+                }
+                if (response.getError() != null) {
+                    // Handle errors, will do so later.
+                }
+            }
+        });
         request.executeAsync();
     }
 }

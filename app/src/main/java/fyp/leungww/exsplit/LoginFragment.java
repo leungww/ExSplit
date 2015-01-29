@@ -16,12 +16,12 @@ import com.facebook.widget.LoginButton;
 
 public class LoginFragment extends Fragment {
     private static final String TAG = "LoginFragment";
-    public static final String[] FB_READ_PERMISSIONS= {"public_profile"};
+    public static final String[] FB_READ_PERMISSIONS= {"public_profile", "user_friends"};
 
     private Session.StatusCallback callback = new Session.StatusCallback() {
         @Override
         public void call(Session session, SessionState state, Exception exception) {
-            onSessionStateChange(session, state, exception);
+        onSessionStateChange(session, state, exception);
         }
     };
     private UiLifecycleHelper uiHelper;

@@ -2,7 +2,7 @@
 <resources>
 
     <string name="app_name">ExSplit</string>
-    <string name="app_id">654982424611897</string>
+    <string name="app_id">658961030880703</string>
     <string name="title_activity_main">ExSplit</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
@@ -25,5 +25,13 @@
     <string name="add_via_fb">Add via Facebook</string>
     <string name="save">Save</string>
     <string name="none">None</string>
+    <string name="title_activity_add_travellers">AddTravellersActivity</string>
+    <string name="exception">Exception: %1$s</string>
+    <string name="title_activity_add_traveller">Add Travellers via Facebook</string>
+    <string name="error_dialog_title">Error</string>
+    <string name="error_dialog_button_text">OK</string>
+    <string name="single_user_selected">%1$s</string>
+    <string name="two_users_selected">%1$s and %2$s</string>
+    <string name="multiple_users_selected">%1$s and %2$s others</string>
 
 </resources>

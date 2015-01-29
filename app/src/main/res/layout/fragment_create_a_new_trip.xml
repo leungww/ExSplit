@@ -161,15 +161,11 @@
         android:text="@string/travellers"
         android:textColor="@color/primaryColorLight" />
 
-    <TextView
-        android:id="@+id/newtrip_traveller"
+    <ListView
+        android:id="@+id/travellers_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/attribute_margin"
-        android:gravity="center"
-        android:textColor="@color/primaryColor"
-        android:text="@string/none">
-    </TextView>
+        android:layout_marginTop="@dimen/attribute_margin" />
 
     <Button
         android:id="@+id/newtrip_add_travellers"
