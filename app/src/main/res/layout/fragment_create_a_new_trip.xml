@@ -1,5 +1,6 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:facebook="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -22,7 +23,7 @@
             android:layout_height="wrap_content"
             android:layout_column="0"
             android:layout_gravity="fill_horizontal"
-            android:layout_marginTop="@dimen/attribute_margin"
+            android:layout_marginTop="@dimen/attribute_button_space"
             android:layout_row="0"
             android:gravity="center"
             android:hint="@string/newtrip_name"
@@ -37,7 +38,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_column="1"
-            android:layout_marginTop="@dimen/attribute_margin"
+            android:layout_marginTop="@dimen/attribute_button_space"
             android:layout_row="0"
             android:text="@string/save"
             android:textColor="@android:color/white"
@@ -55,10 +56,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_column="0"
-            android:layout_marginTop="@dimen/attribute_button_space"
+            android:layout_marginTop="@dimen/attribute_margin"
             android:layout_row="0"
-            android:text="@string/from"
-            android:textColor="@color/primaryColorLight" />
+            android:text="@string/from" />
 
         <Button
             android:id="@+id/newtrip_from"
@@ -66,22 +66,18 @@
             android:layout_height="wrap_content"
             android:layout_column="1"
             android:layout_gravity="fill_horizontal"
-            android:layout_marginTop="@dimen/attribute_button_space"
+            android:layout_marginTop="@dimen/attribute_margin"
             android:layout_row="0"
             android:gravity="center"
-            android:background="@android:color/white"
-            android:text="@string/date_format"
-            android:textColor="@color/hintColor" />
+            android:text="@string/date_format" />
 
         <TextView
-            android:id="@+id/newtrip_text_to"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_column="0"
             android:layout_marginTop="@dimen/attribute_margin"
             android:layout_row="1"
-            android:text="@string/to"
-            android:textColor="@color/primaryColorLight" />
+            android:text="@string/to" />
 
         <Button
             android:id="@+id/newtrip_to"
@@ -89,21 +85,17 @@
             android:layout_height="wrap_content"
             android:layout_column="1"
             android:layout_gravity="fill_horizontal"
-            android:layout_marginTop="@dimen/attribute_button_space"
+            android:layout_marginTop="@dimen/attribute_margin"
             android:layout_row="1"
             android:gravity="center"
-            android:background="@android:color/white"
-            android:text="@string/date_format"
-            android:textColor="@color/hintColor" />
+            android:text="@string/date_format" />
     </GridLayout>
 
     <TextView
-        android:id="@+id/newtrip_text_countries"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/attribute_margin"
-        android:text="@string/countries"
-        android:textColor="@color/primaryColorLight" />
+        android:text="@string/countries" />
 
     <GridLayout
         android:layout_width="match_parent"
@@ -119,18 +111,16 @@
             android:layout_column="0"
             android:layout_marginTop="@dimen/attribute_margin"
             android:layout_row="0"
-            android:text="@string/canada"
-            android:textColor="@color/primaryColor" />
+            android:text="@string/canada" />
 
         <CheckBox
-            android:id="@+id/newtrip_france"
+            android:id="@+id/newtrip_europe"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_column="1"
             android:layout_marginTop="@dimen/attribute_margin"
             android:layout_row="0"
-            android:text="@string/france"
-            android:textColor="@color/primaryColor" />
+            android:text="@string/europe" />
 
         <CheckBox
             android:id="@+id/newtrip_uk"
@@ -140,8 +130,7 @@
             android:layout_marginTop="@dimen/attribute_margin"
             android:layout_row="1"
             android:checked="true"
-            android:text="@string/uk"
-            android:textColor="@color/primaryColor" />
+            android:text="@string/uk" />
 
         <CheckBox
             android:id="@+id/newtrip_us"
@@ -150,22 +139,14 @@
             android:layout_column="1"
             android:layout_marginTop="@dimen/attribute_margin"
             android:layout_row="1"
-            android:text="@string/us"
-            android:textColor="@color/primaryColor" />
+            android:text="@string/us" />
     </GridLayout>
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/attribute_margin"
-        android:text="@string/travellers"
-        android:textColor="@color/primaryColorLight" />
-
-    <ListView
-        android:id="@+id/travellers_list"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/attribute_margin" />
+        android:text="@string/travellers" />
 
     <Button
         android:id="@+id/newtrip_add_travellers"
@@ -177,5 +158,35 @@
         android:text="@string/add_via_fb"
         android:background="@color/com_facebook_blue"
         android:textColor="@android:color/white" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <com.facebook.widget.ProfilePictureView
+            android:id="@+id/fb_profile_picture"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/attribute_margin"
+            facebook:preset_size="small" />
+
+        <TextView
+            android:id="@+id/fb_username"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="@dimen/attribute_margin"
+            android:layout_marginLeft="@dimen/attribute_margin"
+            android:layout_marginStart="@dimen/attribute_margin"
+            android:text="@string/username" />
+
+    </LinearLayout>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/traveller_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/attribute_margin">
+    </android.support.v7.widget.RecyclerView>
 
 </LinearLayout>

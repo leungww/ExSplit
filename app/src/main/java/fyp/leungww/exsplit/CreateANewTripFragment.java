@@ -1,11 +1,19 @@
 package fyp.leungww.exsplit;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 
+import android.os.Environment;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,16 +22,23 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.facebook.AppEventsLogger;
+import com.facebook.Request;
+import com.facebook.Response;
 import com.facebook.Session;
 import com.facebook.SessionState;
 import com.facebook.UiLifecycleHelper;
+import com.facebook.android.Util;
 import com.facebook.model.GraphObject;
 import com.facebook.model.GraphUser;
+import com.facebook.widget.ProfilePictureView;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -33,30 +48,56 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
+
 
 public class CreateANewTripFragment extends Fragment {
     public static final String FROM_DATE_FRAGMENT_TAG="fromDatePicker";
     public static final String TO_DATE_FRAGMENT_TAG="toDatePicker";
-    public static final int ADD_TRAVELLER_REQUEST_CODE = 0;
-    private static final String TAG ="CreateANewTripFragment";
-
-    private EditText newtrip_name;
-    private static Button newtrip_from, newtrip_to;
-    private static Calendar fromDate, toDate;
-
-    private Session.StatusCallback callback = new Session.StatusCallback() {
-        @Override
-        public void call(Session session, SessionState state, Exception exception) {
-        onSessionStateChange(session, state, exception);
+    private static final List<String> PERMISSIONS = new ArrayList<String>() {
+        {
+            add("user_friends");
+            add("public_profile");
         }
     };
+    public static final int ADD_TRAVELLER_ACTIVITY = 1;
+    public static final String CANADA_CURRENCY_CODE="CAD";
+    public static final String EUROPE_CURRENCY_CODE="EUR";
+    public static final String UK_CURRENCY_CODE="GBP";
+    public static final String US_CURRENCY_CODE="USD";
+    public static final String ACTIVITY_CATEGORY="Trip";
+    private static final String ACTIVITY_DESCRIPTION="Created new trip: ";
+    private static final int ACTIVITY_IS_SYSTEM_GENERATED=1;
+
+    private EditText newtrip_name;
+    private boolean isSessionOpenedForAddTraveller;
+    private static Button newtrip_from, newtrip_to;
+    private static String fromDate, toDate;
+
     private UiLifecycleHelper uiHelper;
-    private Traveller traveller;
+    private GraphUser theUser;
+    private RecyclerView recyclerView;
+    private TravellerAdapter adapter;
+    private List<GraphUser> selection;
+    private ProfilePictureView fb_profile_picture;
+    private TextView fb_username;
+    private CheckBox newtrip_canada, newtrip_europe, newtrip_uk, newtrip_us;
+
+    private TravellerDBAdapter travellerDBAdapter;
+    private AccountDBAdapter accountDBAdapter;
+    private TripDBAdapter tripDBAdapter;
+    private ActivityDBAdapter activityDBAdapter;
 
     public CreateANewTripFragment() {
         // Required empty public constructor
@@ -65,7 +106,12 @@ public class CreateANewTripFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        uiHelper = new UiLifecycleHelper(getActivity(), callback);
+        uiHelper = new UiLifecycleHelper(getActivity(), new Session.StatusCallback() {
+            @Override
+            public void call(Session session, SessionState state, Exception exception) {
+                onSessionStateChange(session, state, exception);
+            }
+        });
         uiHelper.onCreate(savedInstanceState);
     }
 
@@ -91,202 +137,165 @@ public class CreateANewTripFragment extends Fragment {
                 showDatePickerDialog(v);
             }
         });
+        newtrip_canada = (CheckBox) view.findViewById(R.id.newtrip_canada);
+        newtrip_europe = (CheckBox) view.findViewById(R.id.newtrip_europe);
+        newtrip_uk = (CheckBox) view.findViewById(R.id.newtrip_uk);
+        newtrip_us = (CheckBox) view.findViewById(R.id.newtrip_us);
         Button newtrip_add_travellers = (Button) view.findViewById(R.id.newtrip_add_travellers);
         newtrip_add_travellers.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Session session = Session.getActiveSession();
-                if (session != null && session.isOpened()) {
-                    Intent intent = new Intent();
-                    intent.setData(AddTravellerActivity.FRIEND_PICKER);
-                    intent.setClass(getActivity(), AddTravellerActivity.class);
-                    startActivityForResult(intent, ADD_TRAVELLER_REQUEST_CODE);
-                }else{
-                    startActivity(new Intent(getActivity(), LoginActivity.class));
-                }
+                onClickAddTraveller();
             }
         });
-
-        ListView listView = (ListView) view.findViewById(R.id.travellers_list);
-        traveller = new Traveller();
-
-        listView.setAdapter(new TravellerAdapter(getActivity(), R.id.travellers_list, Arrays.asList(traveller)));
-
-        if (savedInstanceState != null) {
-            // Restore the state for each list element
-            traveller.restoreState(savedInstanceState);
+        Session session = Session.getActiveSession();
+        if (session != null && session.isOpened()) {
+            // Get the user's data
+            makeMeRequest(session);
         }
+        recyclerView= (RecyclerView) view.findViewById(R.id.traveller_list);
+        adapter=new TravellerAdapter(getActivity());
+        recyclerView.setAdapter(adapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        fb_profile_picture = (ProfilePictureView) view.findViewById(R.id.fb_profile_picture);
+        fb_username = (TextView) view.findViewById(R.id.fb_username);
+        Button newtrip_save = (Button) view.findViewById(R.id.newtrip_save);
+        newtrip_save.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                saveTrip();
+            }
+        });
+        travellerDBAdapter = new TravellerDBAdapter(getActivity());
+        accountDBAdapter = new AccountDBAdapter(getActivity());
+        tripDBAdapter = new TripDBAdapter(getActivity());
+        activityDBAdapter = new ActivityDBAdapter(getActivity());
         return view;
     }
 
-    private class TravellerAdapter extends ArrayAdapter<Traveller> {
-        private List<Traveller> travellers;
-
-        public TravellerAdapter(Context context, int resourceId, List<Traveller> travellers) {
-            super(context, resourceId, travellers);
-            this.travellers = travellers;
-            // Set up as an observer for list item changes to
-            // refresh the view.
-            for (int i = 0; i < travellers.size(); i++) {
-                travellers.get(i).setAdapter(this);
-            }
+    private void saveTrip(){
+        List<String> errors = new ArrayList<>();
+        String name = newtrip_name.getText().toString().trim();
+        if(name.length() == 0){
+            errors.add("Trip name is empty");
+        }
+        if(fromDate == null){
+            errors.add("Start date is not selected");
+        }
+        if (toDate == null){
+            errors.add("End date is not selected");
+        }
+        if(fromDate != null && toDate != null && fromDate.compareTo(toDate) >=0){
+            errors.add("Start date is after or same as end date");
+        }
+        if (!newtrip_canada.isChecked() && !newtrip_europe.isChecked() && !newtrip_uk.isChecked() && !newtrip_us.isChecked()){
+            errors.add("No country is checked");
+        }
+        if(theUser == null || selection == null || selection.size() == 0){
+            errors.add("No friend is selected");
         }
 
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            View view = convertView;
-            if (view == null) {
-                LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                view = inflater.inflate(R.layout.traveller_row, parent, false);
-            }
-
-            Traveller traveller = travellers.get(position);
-            if (traveller != null) {
-                //view.setOnClickListener(traveller.getOnClickListener());
-                //traveller.setButtonListener();
-                TextView travellers = (TextView) view.findViewById(R.id.travellers);
-                if (travellers != null) {
-                    travellers.setText(traveller.getTravellers());
-                }
-            }
-            return view;
-        }
-    }
-
-    private class Traveller {
-        private static final String FRIENDS_KEY = "friends";
-        private String travellers;
-        private BaseAdapter adapter;
-        private List<GraphUser> selectedTravellers;
-
-        public void setAdapter(BaseAdapter adapter) {
-            this.adapter = adapter;
-        }
-
-        public String getTravellers() {
-            return travellers;
-        }
-
-        public void setTravellers(String travellers) {
-            this.travellers = travellers;
-            if (adapter != null) {
-                adapter.notifyDataSetChanged();
-            }
-        }
-
-        private void setTravellers() {
-            String text = null;
-            if (selectedTravellers != null) {
-                if (selectedTravellers.size() == 1) {
-                    text = String.format(getResources().getString(R.string.single_user_selected),
-                            selectedTravellers.get(0).getName());
-                } else if (selectedTravellers.size() == 2) {
-                    text = String.format(getResources().getString(R.string.two_users_selected),
-                            selectedTravellers.get(0).getName(), selectedTravellers.get(1).getName());
-                } else if (selectedTravellers.size() > 2) {
-                    text = String.format(getResources().getString(R.string.multiple_users_selected),
-                            selectedTravellers.get(0).getName(), (selectedTravellers.size() - 1));
-                }
-            }
-            if (text == null) {
-                text = getResources().getString(R.string.none);
-            }
-            setTravellers(text);
-        }
-
-        protected void onActivityResult(Intent data) {
-            selectedTravellers = ((ExSplitApplication) getActivity().getApplication()).getSelectedTravellers();
-            setTravellers();
-            adapter.notifyDataSetChanged();
-        }
-
-        private byte[] getByteArray(List<GraphUser> users) {
-            // convert the list of GraphUsers to a list of String where each element is
-            // the JSON representation of the GraphUser so it can be stored in a Bundle
-            List<String> usersAsString = new ArrayList<>(users.size());
-
-            for (GraphUser user : users) {
-                usersAsString.add(user.getInnerJSONObject().toString());
-            }
-            try {
-                ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-                new ObjectOutputStream(outputStream).writeObject(usersAsString);
-                return outputStream.toByteArray();
-            } catch (IOException e) {
-                Log.e(TAG, "Unable to serialize users.", e);
-            }
-            return null;
-        }
-
-        protected void onSaveInstanceState(Bundle bundle) {
-            if (selectedTravellers != null) {
-                bundle.putByteArray(FRIENDS_KEY, getByteArray(selectedTravellers));
-            }
-        }
-
-        protected boolean restoreState(Bundle savedState) {
-            byte[] bytes = savedState.getByteArray(FRIENDS_KEY);
-            if (bytes != null) {
-                selectedTravellers = restoreByteArray(bytes);
-                setTravellers();
-                return true;
-            }
-            return false;
-        }
-
-        private List<GraphUser> restoreByteArray(byte[] bytes) {
-            try {
-                List<String> usersAsString = (List<String>) (new ObjectInputStream(new ByteArrayInputStream(bytes))).readObject();
-                if (usersAsString != null) {
-                    List<GraphUser> users = new ArrayList<GraphUser>(usersAsString.size());
-                    for (String user : usersAsString) {
-                        GraphUser graphUser = GraphObject.Factory.create(new JSONObject(user), GraphUser.class);
-                        users.add(graphUser);
+        if(errors.isEmpty()){
+            List<GraphUser> allTravellers = new ArrayList<>(selection);
+            allTravellers.add(theUser);
+            List<Long> travellers_id = new ArrayList<>();
+            try{
+                for(GraphUser traveller:allTravellers) {
+                    //Save traveller information in database
+                    long traveller_id = travellerDBAdapter.insert(traveller.getName(), traveller.getId());
+                    travellers_id.add(traveller_id);
+                    if (traveller_id < 0) {
+                        throw new SQLException("Errors occurred in saving travellers' information to database. Please try again.");
                     }
-                    return users;
+                    //Create different currency accounts for the traveller
+                    if (newtrip_canada.isChecked()) {
+                        long account_id = accountDBAdapter.insert(traveller_id, CANADA_CURRENCY_CODE);
+                        if (account_id < 0) {
+                            throw new SQLException("Errors occurred in creating travellers' accounts in database. Please try again.");
+                        }
+                    }
+                    if (newtrip_europe.isChecked()) {
+                        long account_id = accountDBAdapter.insert(traveller_id, EUROPE_CURRENCY_CODE);
+                        if (account_id < 0) {
+                            throw new SQLException("Errors occurred in creating travellers' accounts in database. Please try again.");
+                        }
+                    }
+                    if (newtrip_uk.isChecked()) {
+                        long account_id = accountDBAdapter.insert(traveller_id, UK_CURRENCY_CODE);
+                        if (account_id < 0) {
+                            throw new SQLException("Errors occurred in creating travellers' accounts in database. Please try again.");
+                        }
+                    }
+                    if (newtrip_us.isChecked()) {
+                        long account_id = accountDBAdapter.insert(traveller_id, US_CURRENCY_CODE);
+                        if (account_id < 0) {
+                            throw new SQLException("Errors occurred in creating travellers' accounts in database. Please try again.");
+                        }
+                    }
                 }
-            } catch (ClassNotFoundException | IOException | JSONException e) {
-                Log.e(TAG, "Unable to deserialize users.", e);
+                List<String> countries = new ArrayList<>();
+                if(newtrip_canada.isChecked()){
+                    countries.add(CANADA_CURRENCY_CODE);
+                }
+                if(newtrip_europe.isChecked()){
+                    countries.add(EUROPE_CURRENCY_CODE);
+                }
+                if(newtrip_uk.isChecked()){
+                    countries.add(UK_CURRENCY_CODE);
+                }
+                if(newtrip_us.isChecked()){
+                    countries.add(US_CURRENCY_CODE);
+                }
+                //Create trip
+                long trip_id = tripDBAdapter.insertAll(name, fromDate, toDate, TextUtils.join(",", countries),travellers_id);
+
+                //Create activity
+                String createdDate = new SimpleDateFormat("dd-MM-yyyy").format(new Date());
+                activityDBAdapter.insertAll(travellers_id, createdDate, ACTIVITY_CATEGORY,
+                        ACTIVITY_DESCRIPTION+name, ACTIVITY_IS_SYSTEM_GENERATED, trip_id);
+
+            }catch(SQLException e){
+                Toast toast = Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT);
+                toast.show();
             }
-            return null;
+
+        }else{
+            Toast toast = Toast.makeText(getActivity(), TextUtils.join("\n", errors), Toast.LENGTH_SHORT);
+            toast.show();
         }
+
     }
 
-    private void onSessionStateChange(Session session, SessionState state, Exception exception) {
-        if (session != null && session.isOpened()) {
-            //Log.i(TAG, "Logged in to Facebook");
-        } else if (state.isClosed()) {
-            //Log.i(TAG, "Logged out from Facebook");
-        }
+    private void onClickAddTraveller(){
+        startAddTravellerActivity();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        // Update the display every time we are started.
+        displaySelectedFriends(Activity.RESULT_OK);
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        // For scenarios where the main activity is launched and user session is not null, the session state change notification may not be triggered. Trigger it if it's open/closed.
         Session session = Session.getActiveSession();
         if (session != null && (session.isOpened() || session.isClosed()) ) {
             onSessionStateChange(session, session.getState(), null);
         }
-        uiHelper.onResume();
-    }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == ADD_TRAVELLER_REQUEST_CODE) {
-            if (resultCode == Activity.RESULT_OK) {
-                traveller.onActivityResult(data);
-            }
-        }
-//        else {
-//            uiHelper.onActivityResult(travellerBases, resultCode, data, nativeDialogCallback);
-//        }
+        // Call the 'activateApp' method to log an app event for use in analytics and advertising reporting.  Do so in the onResume methods of the primary Activities that an app may be launched into.
+        AppEventsLogger.activateApp(getActivity());
+        uiHelper.onResume();
     }
 
     @Override
     public void onPause() {
         super.onPause();
+
+        // Call the 'deactivateApp' method to log an app event for use in analytics and advertising reporting.  Do so in the onPause methods of the primary Activities that an app may be launched into.
+        AppEventsLogger.deactivateApp(getActivity());
         uiHelper.onPause();
     }
 
@@ -297,10 +306,137 @@ public class CreateANewTripFragment extends Fragment {
     }
 
     @Override
-    public void onSaveInstanceState(Bundle bundle) {
-        super.onSaveInstanceState(bundle);
-        traveller.onSaveInstanceState(bundle);
-        uiHelper.onSaveInstanceState(bundle);
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        uiHelper.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case ADD_TRAVELLER_ACTIVITY:
+                displaySelectedFriends(resultCode);
+                break;
+            default:
+                Session.getActiveSession().onActivityResult(getActivity(), requestCode, resultCode, data);
+                break;
+        }
+        uiHelper.onActivityResult(requestCode, resultCode, data);
+    }
+
+    private boolean ensureOpenSession() {
+        if (Session.getActiveSession() == null || !Session.getActiveSession().isOpened()) {
+            Session.openActiveSession(getActivity(), true, PERMISSIONS, new Session.StatusCallback() {
+                @Override
+                public void call(Session session, SessionState state, Exception exception) {
+                    onSessionStateChange(session, state, exception);
+                }
+            });
+            return false;
+        }
+        return true;
+    }
+
+    private boolean hasNecessaryPermissions(Session session) {
+        if (session != null && session.getPermissions() != null) {
+            for (String requestedPerm : PERMISSIONS) {
+                if (!session.getPermissions().contains(requestedPerm)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
+    }
+
+    private List<String> getMissingPermissions(Session session) {
+        List<String> missingPerms = new ArrayList<String>(PERMISSIONS);
+        if (session != null && session.getPermissions() != null) {
+            for (String requestedPerm : PERMISSIONS) {
+                if (session.getPermissions().contains(requestedPerm)) {
+                    missingPerms.remove(requestedPerm);
+                }
+            }
+        }
+        return missingPerms;
+    }
+
+    private void onSessionStateChange(final Session session, SessionState state, Exception exception) {
+        if (session != null && session.isOpened()) {
+            makeMeRequest(session);
+        }
+        if (state.isOpened() && !hasNecessaryPermissions(session)) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setMessage(R.string.friend_picker_permission_alert);
+            builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    session.requestNewReadPermissions(new Session.NewPermissionsRequest(CreateANewTripFragment.this, getMissingPermissions(session)));
+                }
+            });
+            builder.setNegativeButton(R.string.cancel,new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    getActivity().finish();
+                }
+            });
+            builder.show();
+        } else if (isSessionOpenedForAddTraveller && state.isOpened()) {
+            isSessionOpenedForAddTraveller = false;
+            startAddTravellerActivity();
+        }
+    }
+
+    private void displaySelectedFriends(int resultCode) {
+        ExSplitApplication application = (ExSplitApplication) getActivity().getApplication();
+        selection = application.getSelectedTravellers();
+
+        //if (selection != null && selection.size() > 0) {
+        if (selection != null && theUser != null) {
+            adapter.removeAll();
+            for(GraphUser traveller:selection){
+                adapter.add(traveller);
+            }
+            fb_profile_picture.setProfileId(theUser.getId());
+            fb_username.setText(theUser.getName()+" ("+getString(R.string.you)+")");
+        }
+    }
+
+    private void makeMeRequest(final Session session) {
+        // Make an API call to get user data and define a
+        // new callback to handle the response.
+        Request request = Request.newMeRequest(session, new Request.GraphUserCallback() {
+            @Override
+            public void onCompleted(GraphUser user, Response response) {
+                // If the response is successful
+                if (session == Session.getActiveSession()) {
+                    if (user != null) {
+                        //profilePictureView.setProfileId(user.getId());
+                        //userNameView.setText(user.getName());
+                        theUser = user;
+                        long _id = travellerDBAdapter.insert(theUser.getName(), theUser.getId());
+                        ExSplitApplication application = (ExSplitApplication) getActivity().getApplication();
+                        application.setUser_id(_id);
+                    }
+                }
+                if (response.getError() != null) {
+                    // Handle errors, will do so later.
+                }
+            }
+        });
+        request.executeAsync();
+    }
+
+    private void startAddTravellerActivity() {
+        if (ensureOpenSession()) {
+            Intent intent = new Intent(getActivity(), AddTravellerActivity.class);
+            //TODO: find userId
+            AddTravellerActivity.populateParameters(intent, null, true, true);
+            startActivityForResult(intent, ADD_TRAVELLER_ACTIVITY);
+        } else {
+            isSessionOpenedForAddTraveller = true;
+        }
     }
 
     public void showDatePickerDialog(View v) {
@@ -317,10 +453,11 @@ public class CreateANewTripFragment extends Fragment {
     public static class FromDatePickerFragment extends DatePickerFragment{
         @Override
         public void onDateSet(DatePicker view, int year, int month, int day) {
-            newtrip_from.setTextColor(getResources().getColor(R.color.primaryColor));
-            fromDate = Calendar.getInstance();
-            fromDate.set(year, month, day);
-            String date = new SimpleDateFormat("dd-MMM-yyyy").format(fromDate.getTime());
+            newtrip_from.setBackgroundColor(Color.WHITE);
+            Calendar from = Calendar.getInstance();
+            from.set(year, month, day);
+            String date = new SimpleDateFormat("dd-MMM-yyyy").format(from.getTime());
+            fromDate = new SimpleDateFormat("dd-MM-yyyy").format(from.getTime());
             newtrip_from.setText(date);
         }
     }
@@ -328,12 +465,15 @@ public class CreateANewTripFragment extends Fragment {
     public static class ToDatePickerFragment extends DatePickerFragment{
         @Override
         public void onDateSet(DatePicker view, int year, int month, int day) {
-            newtrip_to.setTextColor(getResources().getColor(R.color.primaryColor));
-            toDate = Calendar.getInstance();
-            toDate.set(year, month, day);
-            String date = new SimpleDateFormat("dd-MMM-yyyy").format(toDate.getTime());
+            newtrip_to.setBackgroundColor(Color.WHITE);
+            Calendar to = Calendar.getInstance();
+            to.set(year, month, day);
+            String date = new SimpleDateFormat("dd-MMM-yyyy").format(to.getTime());
+            toDate = new SimpleDateFormat("dd-MM-yyyy").format(to.getTime());
             newtrip_to.setText(date);
         }
     }
+
+
 }
 

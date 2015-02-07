@@ -2,101 +2,88 @@ package fyp.leungww.exsplit;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.net.Uri;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.facebook.FacebookException;
+import com.facebook.Session;
+import com.facebook.model.GraphUser;
 import com.facebook.widget.FriendPickerFragment;
 import com.facebook.widget.PickerFragment;
 
+import java.util.List;
+
 
 public class AddTravellerActivity extends FragmentActivity {
-    public static final Uri FRIEND_PICKER = Uri.parse("picker://friend");
 
     private FriendPickerFragment friendPickerFragment;
+
+    public static void populateParameters(Intent intent, String userId, boolean multiSelect, boolean showTitleBar) {
+        intent.putExtra(FriendPickerFragment.USER_ID_BUNDLE_KEY, userId);
+        intent.putExtra(FriendPickerFragment.MULTI_SELECT_BUNDLE_KEY, multiSelect);
+        intent.putExtra(FriendPickerFragment.SHOW_TITLE_BAR_BUNDLE_KEY, showTitleBar);
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_traveller);
 
-        Bundle args = getIntent().getExtras();
-        Fragment fragment;
-        Uri intentUri = getIntent().getData();
-
-        if (FRIEND_PICKER.equals(intentUri)) {
-            if (savedInstanceState == null) {
-                friendPickerFragment = new FriendPickerFragment(args);
-            } else {
-                friendPickerFragment = (FriendPickerFragment) getSupportFragmentManager().findFragmentById(R.id.add_traveller_fragment);
-            }
-            // Set the listener to handle errors
-            friendPickerFragment.setOnErrorListener(new PickerFragment.OnErrorListener() {
-                @Override
-                public void onError(PickerFragment<?> fragment, FacebookException error) {
-                    AddTravellerActivity.this.onError(error);
-                }
-            });
-            // Set the listener to handle button clicks
-            friendPickerFragment.setOnDoneButtonClickedListener(new PickerFragment.OnDoneButtonClickedListener() {
-                @Override
-                public void onDoneButtonClicked(PickerFragment<?> fragment) {
-                    finishActivity();
-                }
-            });
-            fragment = friendPickerFragment;
+        if (savedInstanceState == null) {
+            final Bundle args = getIntent().getExtras();
+            friendPickerFragment = new FriendPickerFragment(args);
+            getSupportFragmentManager().beginTransaction().add(R.id.add_traveller_fragment, friendPickerFragment).commit();
         } else {
-            setResult(RESULT_CANCELED);
-            finish();
-            return;
+            friendPickerFragment = (FriendPickerFragment) getSupportFragmentManager().findFragmentById(R.id.add_traveller_fragment);
         }
-        getSupportFragmentManager().beginTransaction().replace(R.id.add_traveller_fragment, fragment).commit();
+
+        friendPickerFragment.setOnErrorListener(new PickerFragment.OnErrorListener() {
+            @Override
+            public void onError(PickerFragment<?> fragment, FacebookException error) {
+                AddTravellerActivity.this.onError(error);
+            }
+        });
+
+        friendPickerFragment.setOnDoneButtonClickedListener(new PickerFragment.OnDoneButtonClickedListener() {
+            @Override
+            public void onDoneButtonClicked(PickerFragment<?> fragment) {
+                ExSplitApplication application = (ExSplitApplication) getApplication();
+                application.setSelectedTravellers(friendPickerFragment.getSelection());
+
+                setResult(RESULT_OK, null);
+                finish();
+            }
+        });
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        if (FRIEND_PICKER.equals(getIntent().getData())) {
-            try {
-                friendPickerFragment.loadData(false);
-            } catch (Exception ex) {
-                onError(ex);
+        try {
+            ExSplitApplication application = (ExSplitApplication) getApplication();
+            List<GraphUser> selectedTravellers = application.getSelectedTravellers();
+            if (selectedTravellers != null && !selectedTravellers.isEmpty()) {
+                friendPickerFragment.setSelection(selectedTravellers);
             }
+            // Load data, unless a query has already taken place.
+            friendPickerFragment.loadData(false);
+        } catch (Exception e) {
+            onError(e);
         }
     }
 
     private void onError(Exception error) {
-        onError(error.getLocalizedMessage(), false);
+        String text = getString(R.string.exception, error.getMessage());
+        Toast toast = Toast.makeText(this, text, Toast.LENGTH_SHORT);
+        toast.show();
     }
-
-    private void onError(String error, final boolean finishActivity) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(R.string.error_dialog_title).setMessage(error).setPositiveButton(R.string.error_dialog_button_text,new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-            if (finishActivity) {
-                finishActivity();
-            }
-            }
-        });
-        builder.show();
-    }
-
-    private void finishActivity() {
-        ExSplitApplication app = (ExSplitApplication) getApplication();
-        if (FRIEND_PICKER.equals(getIntent().getData())) {
-            if (friendPickerFragment != null) {
-                app.setSelectedTravellers(friendPickerFragment.getSelection());
-            }
-        }
-        setResult(RESULT_OK, null);
-        finish();
-    }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

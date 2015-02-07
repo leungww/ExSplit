@@ -18,7 +18,7 @@
     <string name="countries">Countries</string>
     <string name="travellers">Travellers</string>
     <string name="canada">Canada</string>
-    <string name="france">France</string>
+    <string name="europe">Europe</string>
     <string name="uk">United Kingdom</string>
     <string name="us">United States</string>
     <string name="date_format">Day-Month-Year</string>
@@ -33,5 +33,24 @@
     <string name="single_user_selected">%1$s</string>
     <string name="two_users_selected">%1$s and %2$s</string>
     <string name="multiple_users_selected">%1$s and %2$s others</string>
+    <string name="newbill_description">Bill description</string>
+    <string name="next">Next</string>
+    <string-array name="newbill_category">
+        <item>Food and Beverage</item>
+        <item>Transportation</item>
+        <item>Lodging</item>
+        <item>Gifts and Souvenirs</item>
+        <item>Entertainment and Recreation</item>
+    </string-array>
+    <string name="total">Total</string>
+    <string name="number_zero">0</string>
+    <string name="shared_between_travellers_in">Shared between travellers in</string>
+    <string name="add_item">Add item</string>
+    <string name="category">Category</string>
+    <string name="date">Date</string>
+    <string name="cancel">Cancel</string>
+    <string name="ok">Okay</string>
+    <string name="friend_picker_permission_alert">In order to add travellers you need to accept all the permissions on the following page.</string>
+    <string name="you">You</string>
 
 </resources>
