@@ -5,27 +5,24 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 
-import android.os.Environment;
-import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.ArrayAdapter;
-import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.ListView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,31 +32,15 @@ import com.facebook.Response;
 import com.facebook.Session;
 import com.facebook.SessionState;
 import com.facebook.UiLifecycleHelper;
-import com.facebook.android.Util;
-import com.facebook.model.GraphObject;
 import com.facebook.model.GraphUser;
 import com.facebook.widget.ProfilePictureView;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 
 public class CreateANewTripFragment extends Fragment {
@@ -82,16 +63,14 @@ public class CreateANewTripFragment extends Fragment {
 
     private EditText newtrip_name;
     private boolean isSessionOpenedForAddTraveller;
+    private LinearLayout newtrip_traveller_list;
+    private LayoutInflater inflater;
     private static Button newtrip_from, newtrip_to;
     private static String fromDate, toDate;
 
     private UiLifecycleHelper uiHelper;
     private GraphUser theUser;
-    private RecyclerView recyclerView;
-    private TravellerAdapter adapter;
     private List<GraphUser> selection;
-    private ProfilePictureView fb_profile_picture;
-    private TextView fb_username;
     private CheckBox newtrip_canada, newtrip_europe, newtrip_uk, newtrip_us;
 
     private TravellerDBAdapter travellerDBAdapter;
@@ -118,6 +97,7 @@ public class CreateANewTripFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+        this.inflater = inflater;
         View view = inflater.inflate(R.layout.fragment_create_a_new_trip, container, false);
         newtrip_name = (EditText) view.findViewById(R.id.newtrip_name);
         InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(
@@ -153,12 +133,7 @@ public class CreateANewTripFragment extends Fragment {
             // Get the user's data
             makeMeRequest(session);
         }
-        recyclerView= (RecyclerView) view.findViewById(R.id.traveller_list);
-        adapter=new TravellerAdapter(getActivity());
-        recyclerView.setAdapter(adapter);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        fb_profile_picture = (ProfilePictureView) view.findViewById(R.id.fb_profile_picture);
-        fb_username = (TextView) view.findViewById(R.id.fb_username);
+        newtrip_traveller_list = (LinearLayout) view.findViewById(R.id.newtrip_traveller_list);
         Button newtrip_save = (Button) view.findViewById(R.id.newtrip_save);
         newtrip_save.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -250,10 +225,16 @@ public class CreateANewTripFragment extends Fragment {
                 long trip_id = tripDBAdapter.insertAll(name, fromDate, toDate, TextUtils.join(",", countries),travellers_id);
 
                 //Create activity
-                String createdDate = new SimpleDateFormat("dd-MM-yyyy").format(new Date());
+                String createdDate = new SimpleDateFormat(Trip.DATE_FORMAT).format(new Date());
                 activityDBAdapter.insertAll(travellers_id, createdDate, ACTIVITY_CATEGORY,
                         ACTIVITY_DESCRIPTION+name, ACTIVITY_IS_SYSTEM_GENERATED, trip_id);
-
+                Toast toast = Toast.makeText(getActivity(), "Trip has been created", Toast.LENGTH_SHORT);
+                toast.show();
+                FragmentTransaction transaction = getFragmentManager().beginTransaction();
+                Fragment newFragment = new AddANewBillStep1Fragment();
+                transaction.replace(R.id.container, newFragment);
+                transaction.commit();
+                ((ActionBarActivity)getActivity()).getSupportActionBar().setTitle(getString(R.string.add_a_new_bill));
             }catch(SQLException e){
                 Toast toast = Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT);
                 toast.show();
@@ -389,35 +370,43 @@ public class CreateANewTripFragment extends Fragment {
     }
 
     private void displaySelectedFriends(int resultCode) {
-        ExSplitApplication application = (ExSplitApplication) getActivity().getApplication();
-        selection = application.getSelectedTravellers();
-
-        //if (selection != null && selection.size() > 0) {
-        if (selection != null && theUser != null) {
-            adapter.removeAll();
-            for(GraphUser traveller:selection){
-                adapter.add(traveller);
+        newtrip_traveller_list.removeAllViews();
+        if(resultCode == Activity.RESULT_OK){
+            ExSplitApplication application = (ExSplitApplication) getActivity().getApplication();
+            selection = application.getSelectedTravellers();
+            if (selection != null && theUser != null) {
+                for (GraphUser traveller : selection) {
+                    View traveller_row = inflater.inflate(R.layout.traveller_row, null);
+                    ProfilePictureView fb_profile_picture = (ProfilePictureView) traveller_row.findViewById(R.id.fb_profile_picture);
+                    TextView fb_profile_username = (TextView) traveller_row.findViewById(R.id.fb_profile_username);
+                    fb_profile_picture.setProfileId(traveller.getId());
+                    fb_profile_username.setText(traveller.getName());
+                    newtrip_traveller_list.addView(traveller_row);
+                }
+                View traveller_row = inflater.inflate(R.layout.traveller_row, null);
+                ProfilePictureView fb_profile_picture = (ProfilePictureView) traveller_row.findViewById(R.id.fb_profile_picture);
+                TextView fb_profile_username = (TextView) traveller_row.findViewById(R.id.fb_profile_username);
+                fb_profile_picture.setProfileId(theUser.getId());
+                fb_profile_username.setText(theUser.getName() + " (" + getString(R.string.you) + ")");
+                newtrip_traveller_list.addView(traveller_row);
             }
-            fb_profile_picture.setProfileId(theUser.getId());
-            fb_username.setText(theUser.getName()+" ("+getString(R.string.you)+")");
         }
     }
 
     private void makeMeRequest(final Session session) {
-        // Make an API call to get user data and define a
-        // new callback to handle the response.
+        // Make an API call to get user data and define a new callback to handle the response.
         Request request = Request.newMeRequest(session, new Request.GraphUserCallback() {
             @Override
             public void onCompleted(GraphUser user, Response response) {
                 // If the response is successful
                 if (session == Session.getActiveSession()) {
                     if (user != null) {
-                        //profilePictureView.setProfileId(user.getId());
-                        //userNameView.setText(user.getName());
                         theUser = user;
                         long _id = travellerDBAdapter.insert(theUser.getName(), theUser.getId());
-                        ExSplitApplication application = (ExSplitApplication) getActivity().getApplication();
-                        application.setUser_id(_id);
+                        SharedPreferences sharedPreferences=getActivity().getSharedPreferences(ExSplitApplication.SHARED_PREF_FILE_USER_INFO, Context.MODE_PRIVATE);
+                        SharedPreferences.Editor editor=sharedPreferences.edit();
+                        editor.putLong(ExSplitApplication.SHARED_PREF_KEY_USER_ID, _id);
+                        editor.commit();
                     }
                 }
                 if (response.getError() != null) {
@@ -457,7 +446,7 @@ public class CreateANewTripFragment extends Fragment {
             Calendar from = Calendar.getInstance();
             from.set(year, month, day);
             String date = new SimpleDateFormat("dd-MMM-yyyy").format(from.getTime());
-            fromDate = new SimpleDateFormat("dd-MM-yyyy").format(from.getTime());
+            fromDate = new SimpleDateFormat(Trip.DATE_FORMAT).format(from.getTime());
             newtrip_from.setText(date);
         }
     }
@@ -469,7 +458,7 @@ public class CreateANewTripFragment extends Fragment {
             Calendar to = Calendar.getInstance();
             to.set(year, month, day);
             String date = new SimpleDateFormat("dd-MMM-yyyy").format(to.getTime());
-            toDate = new SimpleDateFormat("dd-MM-yyyy").format(to.getTime());
+            toDate = new SimpleDateFormat(Trip.DATE_FORMAT).format(to.getTime());
             newtrip_to.setText(date);
         }
     }

@@ -32,14 +32,10 @@ import java.util.Collections;
 import java.util.List;
 
 
-/**
- * A simple {@link Fragment} subclass.
- */
 public class NavigationDrawerFragment extends Fragment implements DrawerAdapter.ClickListener{
     public static final String PREF_FILENAME="testpref";
     public static final String KEY_USER_LEARNED_DRAWER="user_learned_drawer";
     public static final int[] ICONS={R.drawable.ic_home_white_48dp, R.drawable.ic_note_add_white_48dp, R.drawable.ic_person_white_48dp, R.drawable.ic_event_white_48dp};
-    public static final String[] TITLES={"Home", "Add a new bill", "Who's next?", "Create a new trip"};
 
     private ActionBarDrawerToggle mDrawerToggle;
     private DrawerLayout mDrawerLayout;
@@ -64,12 +60,13 @@ public class NavigationDrawerFragment extends Fragment implements DrawerAdapter.
         // Required empty public constructor
     }
 
-    public static List<DrawerInfo> createData() {
+    public List<DrawerInfo> createData() {
         List<DrawerInfo> data=new ArrayList<>();
-        for(int i=0;i<TITLES.length && i<ICONS.length;i++){
+        String[] app_bar_titles = getResources().getStringArray(R.array.app_bar_titles);
+        for(int i=0;i<app_bar_titles.length && i<ICONS.length;i++){
             DrawerInfo myDrawerInfo=new DrawerInfo();
             myDrawerInfo.setIconId(ICONS[i]);
-            myDrawerInfo.setTitle(TITLES[i]);
+            myDrawerInfo.setTitle(app_bar_titles[i]);
             data.add(myDrawerInfo);
         }
         return data;
@@ -91,7 +88,7 @@ public class NavigationDrawerFragment extends Fragment implements DrawerAdapter.
         // Inflate the layout for this fragment
         View view=inflater.inflate(R.layout.fragment_navigation_drawer, container, false);
         recyclerView= (RecyclerView) view.findViewById(R.id.drawer_list);
-        adapter=new DrawerAdapter(getActivity(),NavigationDrawerFragment.createData());
+        adapter=new DrawerAdapter(getActivity(),createData());
         adapter.setMyClickListener(this);
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -166,31 +163,28 @@ public class NavigationDrawerFragment extends Fragment implements DrawerAdapter.
     public void itemClicked(View view, int position) {
         Fragment newFragment;
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
-        //TODO: destroy current fragment before creating a new one
         switch (position) {
             case 0:
                 newFragment = new HomeFragment();
                 transaction.replace(R.id.container, newFragment);
-                transaction.addToBackStack(null);
                 transaction.commit();
                 break;
             case 1:
-                newFragment = new AddANewBillStep1();
+                newFragment = new AddANewBillStep1Fragment();
                 transaction.replace(R.id.container, newFragment);
-                transaction.addToBackStack(null);
                 transaction.commit();
                 break;
             case 2:
-                startActivity(new Intent(getActivity(), LoginActivity.class));
+                startActivity(new Intent(getActivity(), OCRTest.class));
                 break;
             case 3:
                 newFragment = new CreateANewTripFragment();
                 transaction.replace(R.id.container, newFragment);
-                transaction.addToBackStack(null);
                 transaction.commit();
                 break;
         }
-        mToolbar.setTitle(TITLES[position]);
+        String[] app_bar_titles = getResources().getStringArray(R.array.app_bar_titles);
+        mToolbar.setTitle(app_bar_titles[position]);
         mDrawerLayout.closeDrawer(containerView);
     }
 
@@ -239,8 +233,7 @@ public class NavigationDrawerFragment extends Fragment implements DrawerAdapter.
     }
 
     private void makeMeRequest(final Session session) {
-        // Make an API call to get user data and define a
-        // new callback to handle the response.
+        // Make an API call to get user data and define a new callback to handle the response.
         Request request = Request.newMeRequest(session, new Request.GraphUserCallback() {
             @Override
             public void onCompleted(GraphUser user, Response response) {

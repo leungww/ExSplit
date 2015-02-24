@@ -1,6 +1,5 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    xmlns:facebook="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -23,7 +22,7 @@
             android:layout_height="wrap_content"
             android:layout_column="0"
             android:layout_gravity="fill_horizontal"
-            android:layout_marginTop="@dimen/attribute_button_space"
+            android:layout_marginTop="@dimen/attribute_margin"
             android:layout_row="0"
             android:gravity="center"
             android:hint="@string/newtrip_name"
@@ -38,155 +37,139 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_column="1"
-            android:layout_marginTop="@dimen/attribute_button_space"
+            android:layout_marginTop="@dimen/attribute_margin"
             android:layout_row="0"
             android:text="@string/save"
             android:textColor="@android:color/white"
             android:background="@color/accentColor"/>
     </GridLayout>
 
-    <GridLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:columnCount="2"
-        android:orientation="horizontal"
-        android:rowCount="2">
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:isScrollContainer="false">
 
-        <TextView
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_column="0"
-            android:layout_marginTop="@dimen/attribute_margin"
-            android:layout_row="0"
-            android:text="@string/from" />
+            android:orientation="vertical">
 
-        <Button
-            android:id="@+id/newtrip_from"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_column="1"
-            android:layout_gravity="fill_horizontal"
-            android:layout_marginTop="@dimen/attribute_margin"
-            android:layout_row="0"
-            android:gravity="center"
-            android:text="@string/date_format" />
+            <GridLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:columnCount="2"
+                android:orientation="horizontal"
+                android:rowCount="2">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_column="0"
-            android:layout_marginTop="@dimen/attribute_margin"
-            android:layout_row="1"
-            android:text="@string/to" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_column="0"
+                    android:layout_row="0"
+                    android:text="@string/from" />
 
-        <Button
-            android:id="@+id/newtrip_to"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_column="1"
-            android:layout_gravity="fill_horizontal"
-            android:layout_marginTop="@dimen/attribute_margin"
-            android:layout_row="1"
-            android:gravity="center"
-            android:text="@string/date_format" />
-    </GridLayout>
+                <Button
+                    android:id="@+id/newtrip_from"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_column="1"
+                    android:layout_gravity="fill_horizontal"
+                    android:layout_row="0"
+                    android:gravity="center"
+                    android:text="@string/date_format" />
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/attribute_margin"
-        android:text="@string/countries" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_column="0"
+                    android:layout_row="1"
+                    android:text="@string/to" />
 
-    <GridLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:columnCount="2"
-        android:orientation="horizontal"
-        android:rowCount="2">
+                <Button
+                    android:id="@+id/newtrip_to"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_column="1"
+                    android:layout_gravity="fill_horizontal"
+                    android:layout_row="1"
+                    android:gravity="center"
+                    android:text="@string/date_format" />
+            </GridLayout>
 
-        <CheckBox
-            android:id="@+id/newtrip_canada"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_column="0"
-            android:layout_marginTop="@dimen/attribute_margin"
-            android:layout_row="0"
-            android:text="@string/canada" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/countries" />
 
-        <CheckBox
-            android:id="@+id/newtrip_europe"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_column="1"
-            android:layout_marginTop="@dimen/attribute_margin"
-            android:layout_row="0"
-            android:text="@string/europe" />
+            <GridLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:columnCount="2"
+                android:orientation="horizontal"
+                android:rowCount="2">
 
-        <CheckBox
-            android:id="@+id/newtrip_uk"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_column="0"
-            android:layout_marginTop="@dimen/attribute_margin"
-            android:layout_row="1"
-            android:checked="true"
-            android:text="@string/uk" />
+                <CheckBox
+                    android:id="@+id/newtrip_canada"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_column="0"
+                    android:layout_row="0"
+                    android:text="@string/canada" />
 
-        <CheckBox
-            android:id="@+id/newtrip_us"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_column="1"
-            android:layout_marginTop="@dimen/attribute_margin"
-            android:layout_row="1"
-            android:text="@string/us" />
-    </GridLayout>
+                <CheckBox
+                    android:id="@+id/newtrip_europe"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_column="1"
+                    android:layout_row="0"
+                    android:text="@string/europe" />
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/attribute_margin"
-        android:text="@string/travellers" />
+                <CheckBox
+                    android:id="@+id/newtrip_uk"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_column="0"
+                    android:layout_row="1"
+                    android:checked="true"
+                    android:text="@string/uk" />
 
-    <Button
-        android:id="@+id/newtrip_add_travellers"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/attribute_margin"
-        android:layout_marginLeft="@dimen/button_margin"
-        android:layout_marginRight="@dimen/button_margin"
-        android:text="@string/add_via_fb"
-        android:background="@color/com_facebook_blue"
-        android:textColor="@android:color/white" />
+                <CheckBox
+                    android:id="@+id/newtrip_us"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_column="1"
+                    android:layout_row="1"
+                    android:text="@string/us" />
+            </GridLayout>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/travellers" />
 
-        <com.facebook.widget.ProfilePictureView
-            android:id="@+id/fb_profile_picture"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/attribute_margin"
-            facebook:preset_size="small" />
+            <Button
+                android:id="@+id/newtrip_add_travellers"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/attribute_margin"
+                android:layout_marginLeft="@dimen/button_margin"
+                android:layout_marginRight="@dimen/button_margin"
+                android:layout_marginBottom="@dimen/attribute_margin"
+                android:text="@string/add_via_fb"
+                android:background="@color/com_facebook_blue"
+                android:textColor="@android:color/white" />
 
-        <TextView
-            android:id="@+id/fb_username"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="@dimen/attribute_margin"
-            android:layout_marginLeft="@dimen/attribute_margin"
-            android:layout_marginStart="@dimen/attribute_margin"
-            android:text="@string/username" />
+            <LinearLayout
+                android:id="@+id/newtrip_traveller_list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
-    </LinearLayout>
+            </LinearLayout>
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/traveller_list"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/attribute_margin">
-    </android.support.v7.widget.RecyclerView>
+        </LinearLayout>
+
+    </ScrollView>
 
 </LinearLayout>

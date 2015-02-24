@@ -83,13 +83,8 @@ public class AddTravellerActivity extends FragmentActivity {
         String text = getString(R.string.exception, error.getMessage());
         Toast toast = Toast.makeText(this, text, Toast.LENGTH_SHORT);
         toast.show();
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_add_traveller, menu);
-        return true;
+        setResult(RESULT_FIRST_USER, null);
+        finish();
     }
 
     @Override
@@ -97,12 +92,6 @@ public class AddTravellerActivity extends FragmentActivity {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
 
         return super.onOptionsItemSelected(item);
     }

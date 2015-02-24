@@ -17,7 +17,7 @@ public class Activity {
     public Activity(long _id, long traveller, String createdDate, String category, String description, int isSystemGenerated, long objectId) throws ParseException {
         this._id = _id;
         this.traveller = traveller;
-        this.createdDate = new SimpleDateFormat("dd-MM-yyyy").parse(createdDate);
+        this.createdDate = new SimpleDateFormat(Trip.DATE_FORMAT).parse(createdDate);
         this.category = category;
         this.description = description;
         if(isSystemGenerated == 0){

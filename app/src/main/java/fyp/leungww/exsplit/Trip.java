@@ -10,6 +10,8 @@ import java.util.Date;
 import java.util.List;
 
 public class Trip {
+    public static final String DATE_FORMAT="yyyy-MM-dd";
+
     private long id;
     private String name;
     private Date fromDate;
@@ -20,8 +22,8 @@ public class Trip {
     public Trip(long id, String name, String fromDate, String toDate, String countries) throws ParseException {
         this.id = id;
         this.name = name;
-        this.fromDate = new SimpleDateFormat("dd-MM-yyyy").parse(fromDate);
-        this.toDate = new SimpleDateFormat("dd-MM-yyyy").parse(toDate);
+        this.fromDate = new SimpleDateFormat(DATE_FORMAT).parse(fromDate);
+        this.toDate = new SimpleDateFormat(DATE_FORMAT).parse(toDate);
         this.countries = new ArrayList<>(Arrays.asList(countries.split(",")));
     }
 

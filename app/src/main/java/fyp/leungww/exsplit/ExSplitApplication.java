@@ -9,16 +9,9 @@ import com.facebook.model.GraphUser;
 import java.util.List;
 
 public class ExSplitApplication extends Application {
+    public static final String SHARED_PREF_FILE_USER_INFO="user";
+    public static final String SHARED_PREF_KEY_USER_ID="user_id";
     private List<GraphUser> selectedTravellers;
-    private long user_id = -1;
-
-    public long getUser_id() {
-        return user_id;
-    }
-
-    public void setUser_id(long user_id) {
-        this.user_id = user_id;
-    }
 
     public List<GraphUser> getSelectedTravellers() {
         return selectedTravellers;

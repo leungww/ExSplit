@@ -1,0 +1,127 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="fyp.leungww.exsplit.AddItemActivity">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <include
+            android:id="@+id/app_bar"
+            layout="@layout/app_bar" />
+
+    </RelativeLayout>
+
+    <GridLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:columnCount="2"
+        android:orientation="horizontal"
+        android:rowCount="1">
+
+        <EditText
+            android:id="@+id/newitem_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="fill_horizontal"
+            android:layout_marginTop="@dimen/attribute_button_space"
+            android:layout_column="0"
+            android:layout_row="0"
+            android:gravity="center"
+            android:hint="@string/newitem_name"
+            android:singleLine="true"
+            android:maxLength="29"
+            android:textColorHint="@color/hintColor" />
+
+        <Button
+            android:id="@+id/newitem_add"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/attribute_button_space"
+            android:layout_column="1"
+            android:layout_row="0"
+            android:text="@string/add"
+            android:textColor="@android:color/white"
+            android:background="@color/primaryColorLight" />
+
+
+    </GridLayout>
+
+    <GridLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:columnCount="2"
+        android:orientation="horizontal"
+        android:rowCount="2">
+
+        <TextView
+            android:id="@+id/newitem_currency"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_column="0"
+            android:layout_row="0"
+            android:text="@string/price"/>
+
+        <EditText
+            android:id="@+id/newitem_price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="fill_horizontal"
+            android:gravity="center"
+            android:layout_column="1"
+            android:layout_row="0"
+            android:singleLine="true"
+            android:maxLength="15"
+            android:inputType="numberDecimal"
+            android:digits="0123456789." />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_column="0"
+            android:layout_row="1"
+            android:text="@string/way_of_splitting"/>
+
+        <RadioGroup
+            android:id="@+id/newitem_split_way"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_column="1"
+            android:layout_row="1"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/newitem_even_split"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/even_split"/>
+
+            <RadioButton
+                android:id="@+id/newitem_by_amount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/by_amount"/>
+        </RadioGroup>
+
+    </GridLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="fill_parent"
+        android:isScrollContainer="false">
+
+        <LinearLayout
+            android:id="@+id/newitem_split_details"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>

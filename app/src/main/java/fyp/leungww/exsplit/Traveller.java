@@ -24,4 +24,8 @@ public class Traveller {
     public String getFbUserId() {
         return fbUserId;
     }
+
+    public void setName(String name){
+        this.name = name;
+    }
 }
