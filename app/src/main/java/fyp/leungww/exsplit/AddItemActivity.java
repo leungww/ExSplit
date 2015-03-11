@@ -32,7 +32,7 @@ import java.util.Map;
 
 public class AddItemActivity extends ActionBarActivity {
     public static final String ITEM_PARCELABLE="item_parcelable";
-    public static final int EVEN_SPLIT_ROUNDING_DP=1;
+    public static final int EVEN_SPLIT_ROUNDING_DP=2;
 
     private RadioGroup newitem_split_way;
     private LinearLayout newitem_split_details;
@@ -56,8 +56,8 @@ public class AddItemActivity extends ActionBarActivity {
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        Intent i = getIntent();
-        BillParcelable billParcelable = (BillParcelable) i.getParcelableExtra(AddANewBillStep1Fragment.BILL_PARCELABLE);
+        Intent intent = getIntent();
+        BillParcelable billParcelable = intent.getParcelableExtra(AddANewBillStep1Fragment.BILL_PARCELABLE);
         String currencyCodeSymbol = billParcelable.getCurrencyCodeSymbol();
         travellers_id = billParcelable.getTravellers_id();
         travellers_name = billParcelable.getTravellers_name();
@@ -79,6 +79,7 @@ public class AddItemActivity extends ActionBarActivity {
             CheckBox checkBox = (CheckBox) even_split_row.findViewById(R.id.traveller_name);
             checkBoxes.add(checkBox);
             checkBox.setText(name);
+            //checkBox.setChecked(true);
             even_split_rows.add(even_split_row);
 
             View by_amount_row = inflater.inflate(R.layout.by_amount_row, null);
@@ -150,27 +151,31 @@ public class AddItemActivity extends ActionBarActivity {
                     }
                 }
                 if (travellers_even_split.size() == 0) {
-                    errors.add("No traveller is checked to split the price");
+                    errors.add("No traveller is selected");
                 } else if (travellers_even_split.size() == 1){
-                    errors.add("At least 2 travellers are needed to evenly split the price");
+                    errors.add("Select at least 2 travellers");
                 } else{
                     BigDecimal priceBD = BigDecimal.valueOf(price);
                     BigDecimal sizeBD = BigDecimal.valueOf(travellers_even_split.size());
                     BigDecimal evenAmountBD = priceBD.divide(sizeBD, EVEN_SPLIT_ROUNDING_DP, BigDecimal.ROUND_HALF_UP);
                     double evenAmount = evenAmountBD.doubleValue();
-                    for (Long traveller_id : travellers_even_split) {
-                        amounts.put(traveller_id, evenAmount);
-                    }
-                    //Last traveller takes the rounding remains
                     BigDecimal lastAmountBD = priceBD.subtract(evenAmountBD.multiply(sizeBD.subtract(BigDecimal.ONE)));
                     double lastAmount = lastAmountBD.doubleValue();
-                    amounts.put(travellers_even_split.get(travellers_even_split.size()-1), lastAmount);
-                    List<String> names_amounts = new ArrayList<>();
-                    for(int i=0;i<names.size()-1;i++){
-                        names_amounts.add(names.get(i)+" ("+evenAmount+")");
+                    if(evenAmount == 0 || lastAmount == 0){
+                        errors.add("Price cannot be split evenly between selected travellers");
+                    }else{
+                        for (Long traveller_id : travellers_even_split) {
+                            amounts.put(traveller_id, evenAmount);
+                        }
+                        //Last traveller takes the rounding remains
+                        amounts.put(travellers_even_split.get(travellers_even_split.size()-1), lastAmount);
+                        List<String> names_amounts = new ArrayList<>();
+                        for(int i=0;i<names.size()-1;i++){
+                            names_amounts.add(names.get(i)+" ("+evenAmount+")");
+                        }
+                        names_amounts.add(names.get(names.size()-1)+" ("+lastAmount+")");
+                        amounts_string = TextUtils.join(", ", names_amounts);
                     }
-                    names_amounts.add(names.get(names.size()-1)+" ("+lastAmount+")");
-                    amounts_string = TextUtils.join(", ", names_amounts);
                 }
             } else if (checkedId == R.id.newitem_by_amount) {
                 waySplit = getString(R.string.by_amount);
@@ -179,11 +184,15 @@ public class AddItemActivity extends ActionBarActivity {
                 for (int index = 0; index < editTexts.size(); index++) {
                     String amount_string = editTexts.get(index).getText().toString();
                     if (amount_string.length() > 0) {
-                        double amount = Double.parseDouble(amount_string);
-                        if (amount != 0) {
-                            sum = sum.add(BigDecimal.valueOf(amount));
-                            amounts.put(travellers_id.get(index), amount);
-                            names_amounts.add(travellers_name.get(index)+" ("+amount+")");
+                        try {
+                            double amount = Double.parseDouble(amount_string);
+                            if (amount != 0) {
+                                sum = sum.add(BigDecimal.valueOf(amount));
+                                amounts.put(travellers_id.get(index), amount);
+                                names_amounts.add(travellers_name.get(index)+" ("+amount+")");
+                            }
+                        }catch(NumberFormatException e){
+                            errors.add("Invalid amount");
                         }
                     }
                 }
@@ -192,7 +201,7 @@ public class AddItemActivity extends ActionBarActivity {
                     if (sum.doubleValue() > price) {
                         errors.add("Sum of all travellers' amounts exceeds the item price");
                     } else if (sum.doubleValue() < price) {
-                        errors.add("Sum of all travellers' amounts less than the item price");
+                        errors.add("Sum of all travellers' amounts is less than the item price");
                     }
                 }
             } else {

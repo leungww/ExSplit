@@ -35,7 +35,8 @@ import java.util.List;
 public class NavigationDrawerFragment extends Fragment implements DrawerAdapter.ClickListener{
     public static final String PREF_FILENAME="testpref";
     public static final String KEY_USER_LEARNED_DRAWER="user_learned_drawer";
-    public static final int[] ICONS={R.drawable.ic_home_white_48dp, R.drawable.ic_note_add_white_48dp, R.drawable.ic_person_white_48dp, R.drawable.ic_event_white_48dp};
+    public static final int[] ICONS={R.drawable.ic_home_white_48dp, R.drawable.ic_note_add_white_48dp,
+            R.drawable.ic_add_shopping_cart_white_48dp, R.drawable.ic_event_white_48dp};
 
     private ActionBarDrawerToggle mDrawerToggle;
     private DrawerLayout mDrawerLayout;
@@ -175,7 +176,9 @@ public class NavigationDrawerFragment extends Fragment implements DrawerAdapter.
                 transaction.commit();
                 break;
             case 2:
-                startActivity(new Intent(getActivity(), OCRTest.class));
+                newFragment = new AddItemExpressStep1Fragment();
+                transaction.replace(R.id.container, newFragment);
+                transaction.commit();
                 break;
             case 3:
                 newFragment = new CreateANewTripFragment();

@@ -10,7 +10,9 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.v4.app.*;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -31,6 +33,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.math.BigDecimal;
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -46,6 +49,7 @@ public class AddANewBillStep1Fragment extends Fragment implements ItemAdapter.Cl
     public static final int ADD_ITEM_REQUEST_CODE=1;
     public static final int EDIT_ITEM_REQUEST_CODE=2;
     public static final int STEP2_REQUEST_CODE=3;
+    public static final int SELECT_PHOTO_REQUEST_CODE=4;
     public static final String ITEM_NAME="itemName";
     public static final String ITEM_PRICE="itemPrice";
     public static final String ITEM_AMOUNTS="itemAmounts";
@@ -53,6 +57,8 @@ public class AddANewBillStep1Fragment extends Fragment implements ItemAdapter.Cl
     public static final String DATE_FRAGMENT_TAG="createDatePicker";
     public static final String BILL_PARCELABLE="billParcelable";
     public static final String BILL_STEP1_COMPLETED_PARCELABLE="billStep1CompletedParcelable";
+    public static final String ACTIVITY_CATEGORY="Bill";
+    private static final int ACTIVITY_IS_SYSTEM_GENERATED=0;
     private static Button newbill_date;
     private static String createdDate;
 
@@ -60,7 +66,7 @@ public class AddANewBillStep1Fragment extends Fragment implements ItemAdapter.Cl
     private RecyclerView recyclerView;
     private ItemAdapter adapter;
     private Spinner newbill_category, newbill_currency, newbill_trip;
-    private Button newbill_add_item, newbill_next;
+    private Button newbill_add_item, newbill_select_photo, newbill_next;
 
     private List<Trip> trips;
     private List<List<Traveller>> travellers;
@@ -73,8 +79,10 @@ public class AddANewBillStep1Fragment extends Fragment implements ItemAdapter.Cl
 
     private TravellerDBAdapter travellerDBAdapter;
     private TripDBAdapter tripDBAdapter;
-    //private AccountDBAdapter accountDBAdapter;
-    //private ActivityDBAdapter activityDBAdapter;
+    private AccountDBAdapter accountDBAdapter;
+    private ActivityDBAdapter activityDBAdapter;
+    private BillDBAdapter billDBAdapter;
+    private OweDBAdapter oweDBAdapter;
 
     public AddANewBillStep1Fragment() {
         // Required empty public constructor
@@ -104,9 +112,11 @@ public class AddANewBillStep1Fragment extends Fragment implements ItemAdapter.Cl
         });
 
         travellerDBAdapter = new TravellerDBAdapter(getActivity());
-        //accountDBAdapter = new AccountDBAdapter(getActivity());
+        accountDBAdapter = new AccountDBAdapter(getActivity());
         tripDBAdapter = new TripDBAdapter(getActivity());
-        //activityDBAdapter = new ActivityDBAdapter(getActivity());
+        activityDBAdapter = new ActivityDBAdapter(getActivity());
+        billDBAdapter = new BillDBAdapter(getActivity());
+        oweDBAdapter = new OweDBAdapter(getActivity());
 
         newbill_description = (EditText) view.findViewById(R.id.newbill_description);
         newbill_category = (Spinner) view.findViewById(R.id.newbill_category);
@@ -167,19 +177,19 @@ public class AddANewBillStep1Fragment extends Fragment implements ItemAdapter.Cl
 
                 @Override
                 public void onClick(View v) {
-                    String currencyCodeSymbol = (String) newbill_currency.getSelectedItem();
-                    int position = newbill_trip.getSelectedItemPosition();
-                    List<Traveller> travellerList = travellers.get(position);
-                    List<Long> travellers_id = new ArrayList<>();
-                    List<String> travellers_name = new ArrayList<>();
-                    for(Traveller traveller:travellerList){
-                        travellers_id.add(traveller.get_id());
-                        travellers_name.add(traveller.getName());
-                    }
-                    BillParcelable billParcelable = new BillParcelable(currencyCodeSymbol, travellers_id, travellers_name);
-                    Intent intent = new Intent(getActivity(),AddItemActivity.class);
-                    intent.putExtra(BILL_PARCELABLE, billParcelable);
+                    Intent intent = new Intent(getActivity(), AddItemActivity.class);
+                    intent.putExtra(BILL_PARCELABLE, getBillParcelable());
                     startActivityForResult(intent,ADD_ITEM_REQUEST_CODE);
+                }
+            });
+            newbill_select_photo = (Button) view.findViewById(R.id.newbill_select_photo);
+            newbill_select_photo.setOnClickListener(new View.OnClickListener(){
+
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(getActivity(), SelectPhotoActivity.class);
+                    intent.putExtra(BILL_PARCELABLE, getBillParcelable());
+                    startActivityForResult(intent,SELECT_PHOTO_REQUEST_CODE);
                 }
             });
             newbill_next = (Button) view.findViewById(R.id.newbill_next);
@@ -195,6 +205,20 @@ public class AddANewBillStep1Fragment extends Fragment implements ItemAdapter.Cl
         return view;
     }
 
+    private BillParcelable getBillParcelable(){
+        String currencyCodeSymbol = (String) newbill_currency.getSelectedItem();
+        int position = newbill_trip.getSelectedItemPosition();
+        List<Traveller> travellerList = travellers.get(position);
+        List<Long> travellers_id = new ArrayList<>();
+        List<String> travellers_name = new ArrayList<>();
+        for(Traveller traveller:travellerList){
+            travellers_id.add(traveller.get_id());
+            travellers_name.add(traveller.getName());
+        }
+        BillParcelable billParcelable = new BillParcelable(currencyCodeSymbol, travellers_id, travellers_name);
+        return billParcelable;
+    }
+
     private void nextStep(){
         List<String> errors = new ArrayList<>();
         String description = newbill_description.getText().toString().trim();
@@ -208,16 +232,21 @@ public class AddANewBillStep1Fragment extends Fragment implements ItemAdapter.Cl
             errors.add("No item is added");
         }
         if(errors.isEmpty()){
-            Intent intent = new Intent(getActivity(),AddANewBillStep2Activity.class);
-            intent.putExtra(BILL_STEP1_COMPLETED_PARCELABLE, getBillStep1CompletedParcelable());
-            startActivityForResult(intent,STEP2_REQUEST_CODE);
+            try {
+                Intent intent = new Intent(getActivity(), AddANewBillStep2Activity.class);
+                intent.putExtra(BILL_STEP1_COMPLETED_PARCELABLE, getBillStep1CompletedParcelable());
+                startActivityForResult(intent, STEP2_REQUEST_CODE);
+            }catch (IllegalArgumentException e){
+                Toast toast = Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT);
+                toast.show();
+            }
         }else{
             Toast toast = Toast.makeText(getActivity(), TextUtils.join("\n", errors), Toast.LENGTH_SHORT);
             toast.show();
         }
     }
 
-    private BillStep1CompletedParcelable getBillStep1CompletedParcelable(){
+    private BillStep1CompletedParcelable getBillStep1CompletedParcelable() throws IllegalArgumentException{
         String currencyCodeSymbol = (String) newbill_currency.getSelectedItem();
         int position_trip = newbill_trip.getSelectedItemPosition();
         List<Traveller> travellerList = travellers.get(position_trip);
@@ -247,6 +276,12 @@ public class AddANewBillStep1Fragment extends Fragment implements ItemAdapter.Cl
                 }
             }
         }
+        if(totalBD.doubleValue() <= 0){
+            throw new IllegalArgumentException("Total price cannot be negative");
+        }
+        if(Collections.min(travellers_amount) < 0){
+            throw new IllegalArgumentException("Amount needed from each traveller cannot be negative");
+        }
         BillStep1CompletedParcelable billStep1CompletedParcelable = new BillStep1CompletedParcelable(currencyCodeSymbol, travellers_id, travellers_name, travellers_amount, totalBD.doubleValue());
         return billStep1CompletedParcelable;
     }
@@ -258,34 +293,9 @@ public class AddANewBillStep1Fragment extends Fragment implements ItemAdapter.Cl
             case (ADD_ITEM_REQUEST_CODE) : {
                 if (resultCode == android.app.Activity.RESULT_OK) {
                     //Remove all other trips in the newbill_trip spinner except the selected one
-                    if(trips.size()>1){
-                        int position = newbill_trip.getSelectedItemPosition();
-                        Trip trip = trips.get(position);
-                        trips.clear();
-                        trips.add(trip);
-                        List<Traveller> travellerList1 = travellers.get(position);
-                        travellers.clear();
-                        travellers.add(travellerList1);
-                        String details = (String) newbill_trip.getSelectedItem();
-                        List<String> tripDetails = new ArrayList<>();
-                        tripDetails.add(details);
-                        ArrayAdapter<String> tripAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, tripDetails);
-                        tripAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                        newbill_trip.setAdapter(tripAdapter);
-                    }
+                    removeUnselectedTrips();
                     //Remove all other currencies in the newbill_currency spinner except the selected one
-                    if(currencyCodes.size()>1){
-                        int position = newbill_currency.getSelectedItemPosition();
-                        String currencyCode = currencyCodes.get(position);
-                        currencyCodes.clear();
-                        currencyCodes.add(currencyCode);
-                        String currencyCodesSymbol = (String) newbill_currency.getSelectedItem();
-                        List<String> currencyCodesSymbols = new ArrayList<>();
-                        currencyCodesSymbols.add(currencyCodesSymbol);
-                        ArrayAdapter<String> currencyAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, currencyCodesSymbols);
-                        currencyAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                        newbill_currency.setAdapter(currencyAdapter);
-                    }
+                    removeUnselectedCurrencies();
 
                     ItemParcelable itemParcelable = (ItemParcelable) data.getParcelableExtra(AddItemActivity.ITEM_PARCELABLE);
                     String item_name = itemParcelable.getName();
@@ -332,21 +342,98 @@ public class AddANewBillStep1Fragment extends Fragment implements ItemAdapter.Cl
                     List<Long> travellers_id = completedBillParcelable.getTravellers_id();
                     List<Double> amounts_needed = completedBillParcelable.getAmounts_needed();
                     List<Double> amounts_paid = completedBillParcelable.getAmounts_paid();
+
                     List<Long> debtors_id = completedBillParcelable.getDebtors_id();
                     List<Long> creditors_id = completedBillParcelable.getCreditors_id();
                     List<Double> amounts_owed = completedBillParcelable.getAmounts_owed();
 
-                    List<String> tests = new ArrayList<>();
-
-                    tests.add("debtor\tcreditor\tamount owed");
-                    for(int i=0;i<debtors_id.size();i++){
-                        tests.add(debtors_id.get(i)+"\t"+creditors_id.get(i)+"\t"+amounts_owed.get(i));
+                    try {
+                        long bill_id = billDBAdapter.insert(description, createdDate, category,
+                                trip_id, currency, total, items, travellers_id, amounts_needed, amounts_paid);
+                        activityDBAdapter.insertAll(travellers_id, createdDate, ACTIVITY_CATEGORY,
+                                description, ACTIVITY_IS_SYSTEM_GENERATED, bill_id);
+                        accountDBAdapter.updateBalances(travellers_id, currency, amounts_paid);
+                        if(debtors_id.size() != 0 && creditors_id.size() != 0 && amounts_owed.size() != 0) {
+                            oweDBAdapter.insert(bill_id, debtors_id, creditors_id, amounts_owed);
+                        }
+                        Toast toast = Toast.makeText(getActivity(), "Bill "+description+" has been added", Toast.LENGTH_LONG);
+                        toast.show();
+                        android.support.v4.app.FragmentTransaction transaction = getFragmentManager().beginTransaction();
+                        Fragment newFragment = new HomeFragment();
+                        transaction.replace(R.id.container, newFragment);
+                        transaction.commit();
+                        ((ActionBarActivity)getActivity()).getSupportActionBar().setTitle(getString(R.string.home));
+                    } catch (SQLException e) {
+                        Toast toast = Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT);
+                        toast.show();
                     }
-                    Toast toast = Toast.makeText(getActivity(), TextUtils.join("\n", tests), Toast.LENGTH_LONG);
-                    toast.show();
                 }
                 break;
             }
+            case (SELECT_PHOTO_REQUEST_CODE) : {
+                if (resultCode == android.app.Activity.RESULT_OK) {
+                    //Remove all other trips in the newbill_trip spinner except the selected one
+                    removeUnselectedTrips();
+                    //Remove all other currencies in the newbill_currency spinner except the selected one
+                    removeUnselectedCurrencies();
+
+                    ItemsParcelable itemsParcelable = (ItemsParcelable) data.getParcelableExtra(SelectPhotoActivity.ITEMS_PARCELABLE);
+                    List<Long> travellers_id = itemsParcelable.getTravellers_id();
+                    List<String> items_name = itemsParcelable.getItems_name();
+                    String currencyCodeSymbol = (String) newbill_currency.getSelectedItem();
+                    List<Double> items_price = itemsParcelable.getItems_price();
+                    List<String> items_amounts_string = itemsParcelable.getItems_amounts_string();
+                    List<List<Double>> items_amounts = itemsParcelable.getItems_amounts();
+                    for(int index=0;index<items_name.size();index++){
+                        String item_name = items_name.get(index);
+                        Double item_price = items_price.get(index);
+                        String item_split_way = getString(R.string.even_split);
+                        String amounts_string = items_amounts_string.get(index);
+                        List<Double> item_amountsList = items_amounts.get(index);
+                        Map<Long, Double> item_amounts = new HashMap<>();
+                        for(int i=0;i<item_amountsList.size();i++){
+                            item_amounts.put(travellers_id.get(i),item_amountsList.get(i));
+                        }
+                        Item item = new Item(item_name, currencyCodeSymbol, item_price, item_split_way, item_amounts, amounts_string);
+                        items.add(item);
+                        adapter.add(item);
+                    }
+                }
+                break;
+            }
+        }
+    }
+
+    private void removeUnselectedTrips(){
+        if(trips.size()>1){
+            int position = newbill_trip.getSelectedItemPosition();
+            Trip trip = trips.get(position);
+            trips.clear();
+            trips.add(trip);
+            List<Traveller> travellerList1 = travellers.get(position);
+            travellers.clear();
+            travellers.add(travellerList1);
+            String details = (String) newbill_trip.getSelectedItem();
+            List<String> tripDetails = new ArrayList<>();
+            tripDetails.add(details);
+            ArrayAdapter<String> tripAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, tripDetails);
+            tripAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            newbill_trip.setAdapter(tripAdapter);
+        }
+    }
+
+    private void removeUnselectedCurrencies(){
+        if(currencyCodes.size()>1){
+            int position = newbill_currency.getSelectedItemPosition();
+            String currencyCode = currencyCodes.get(position);
+            currencyCodes.clear();
+            currencyCodes.add(currencyCode);
+            String currencyCodesSymbol = (String) newbill_currency.getSelectedItem();
+            List<String> currencyCodesSymbols = new ArrayList<>();
+            currencyCodesSymbols.add(currencyCodesSymbol);
+            ArrayAdapter<String> currencyAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, currencyCodesSymbols);
+            currencyAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            newbill_currency.setAdapter(currencyAdapter);
         }
     }
 

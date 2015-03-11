@@ -34,8 +34,8 @@ public class TripDBAdapter {
     }
 
     public long insertAll(String name, String fromDate, String toDate, String countries, List<Long> travellers){
-        SQLiteDatabase db = tripDBHelper.getWritableDatabase();
         long id = getNextId();
+        SQLiteDatabase db = tripDBHelper.getWritableDatabase();
         db.beginTransaction();
         try {
             for (Long traveller : travellers) {
@@ -68,6 +68,8 @@ public class TripDBAdapter {
             int index = cursor.getColumnIndex(tripDBHelper.ID);
             id = cursor.getLong(index) + 1;
         }
+        cursor.close();
+        db.close();
         return id;
     }
 
@@ -117,6 +119,7 @@ public class TripDBAdapter {
                 trip.setTravellers(travellers);
             }
         }
+        db.close();
         return new ArrayList<Trip>(trips.values());
     }
 
@@ -143,6 +146,7 @@ public class TripDBAdapter {
             trips.append(_id+" "+id+" "+name+" "+fromDate+" "+" "+toDate+" "+countries+" "+traveller+"\n");
         }
         cursor.close();
+        db.close();
         return trips.toString();
     }
 

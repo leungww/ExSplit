@@ -34,13 +34,13 @@
     <string name="next">Next</string>
     <string name="home">Home</string>
     <string name="add_a_new_bill">Add a new bill</string>
-    <string name="who_is_next">Who\'s next?</string>
+    <string name="add_item_express">Add item express</string>
     <string name="create_a_new_trip">Create a new trip</string>
 
     <string-array name="app_bar_titles">
         <item>@string/home</item>
         <item>@string/add_a_new_bill</item>
-        <item>@string/who_is_next</item>
+        <item>@string/add_item_express</item>
         <item>@string/create_a_new_trip</item>
     </string-array>
     <string-array name="newbill_category">
@@ -60,7 +60,7 @@
     <string name="ok">Okay</string>
     <string name="friend_picker_permission_alert">In order to add travellers you need to accept all the permissions on the following page.</string>
     <string name="you">You</string>
-    <string name="newitem_name">Item name</string>
+    <string name="item_name">Item name</string>
     <string name="even_split">Even split</string>
     <string name="by_amount">By amount</string>
     <string name="amount">Amount</string>
@@ -79,5 +79,17 @@
     <string name="paid">Paid</string>
     <string name="traveller">Traveller</string>
     <string name="title_activity_ocrtest">OCRTest</string>
+    <string name="sort_by">Sort by</string>
+    <string name="title_activity_the_bill">The bill</string>
+    <string name="select_photo">Select photo</string>
+    <string name="title_activity_select_photo">Select photo</string>
+    <string name="select_receipt_from">Select receipt from</string>
+    <string name="camera">Camera</string>
+    <string name="gallery">Gallery</string>
+    <string name="recognised_text">Recognised text</string>
+    <string name="activity_log">Activity log</string>
+    <string name="note_items">Note: Price of each item below will be split evenly between all travellers in the selected trip</string>
+    <string name="note_items_invalid">Note: Item(s) below will not be added as price(s) cannot be split evenly between all travellers in the selected trip</string>
+    <string name="item_price">Item price</string>
 
 </resources>

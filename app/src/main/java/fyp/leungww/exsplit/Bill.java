@@ -3,7 +3,10 @@ package fyp.leungww.exsplit;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Bill {
@@ -14,6 +17,11 @@ public class Bill {
     private String category;
     private String currency;
     private double total;
+    private List<Bill.Item> items;
+
+    public String getDescription() {
+        return description;
+    }
 
     public Bill(long _id, long trip, String description, String createdDate, String category, String currency, double total) throws ParseException {
         this._id = _id;
@@ -23,62 +31,39 @@ public class Bill {
         this.category = category;
         this.currency = currency;
         this.total = total;
+        this.items = new ArrayList<>();
     }
 
-    public Bill(String description, Date createdDate, String category, String currency, double total) {
-        this.description = description;
-        this.createdDate = createdDate;
+    public void addItems(List<String> names, List<Double> prices, List<Map<Long, Double>> amountsList){
+        for(int index=0;index<names.size();index++){
+            Bill.Item item = new Bill.Item(names.get(index), prices.get(index), amountsList.get(index));
+            items.add(item);
+        }
 
-        this.category = category;
-        this.currency = currency;
-        this.total = total;
     }
 
-    private Map<Long, Double> amountNeeded;
-    private Map<Long, Double> amountPaid;
+    class Item {
+        private String name;
+        private double price;
+        private Map<Long, Double> amounts;
 
-    public long get_id() {
-        return _id;
-    }
+        public Item(String name, double price, Map<Long, Double> amounts){
+            this.name = name;
+            this.price = price;
+            this.amounts = amounts;
+        }
 
-    public long getTrip() {
-        return trip;
-    }
+        public String getName() {
+            return name;
+        }
 
-    public String getDescription() {
-        return description;
-    }
+        public double getPrice() {
+            return price;
+        }
 
-    public Date getCreatedDate() {
-        return createdDate;
-    }
-
-    public String getCategory() {
-        return category;
-    }
-
-    public String getCurrency() {
-        return currency;
-    }
-
-    public double getTotal() {
-        return total;
-    }
-
-    public Map<Long, Double> getAmountNeeded() {
-        return amountNeeded;
-    }
-
-    public void setAmountNeeded(Map<Long, Double> amountNeeded) {
-        this.amountNeeded = amountNeeded;
-    }
-
-    public Map<Long, Double> getAmountPaid() {
-        return amountPaid;
-    }
-
-    public void setAmountPaid(Map<Long, Double> amountPaid) {
-        this.amountPaid = amountPaid;
+        public Map<Long, Double> getAmounts() {
+            return amounts;
+        }
     }
 
 }

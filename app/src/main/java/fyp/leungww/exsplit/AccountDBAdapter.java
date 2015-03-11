@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -70,6 +71,32 @@ public class AccountDBAdapter {
         }
         cursor.close();
         return accounts;
+    }
+
+    public void updateBalances(List<Long> holders, String currency, List<Double> amounts){
+        SQLiteDatabase db = accountDBHelper.getWritableDatabase();
+        db.beginTransaction();
+        try {
+            for(int index=0;index<holders.size();index++){
+                Account account = getAccount(holders.get(0), currency);
+                if(account != null){
+                    BigDecimal amountBD = BigDecimal.valueOf(amounts.get(index));
+                    double balance = account.getBalance();
+                    BigDecimal balanceBD = BigDecimal.valueOf(balance);
+                    balanceBD = balanceBD.add(amountBD);
+
+                    ContentValues contentValues = new ContentValues();
+                    contentValues.put(AccountDBHelper.BALANCE, balanceBD.doubleValue());
+                    String where = AccountDBHelper.PRIMARY_KEY+" =?";
+                    String[] whereArgs = {account.get_id()+""};
+                    int count = db.update(AccountDBHelper.TABLE_NAME, contentValues, where, whereArgs);
+                }
+            }
+            db.setTransactionSuccessful();
+        }finally {
+            db.endTransaction();
+        }
+        db.close();
     }
 
     static class AccountDBHelper extends SQLiteOpenHelper {

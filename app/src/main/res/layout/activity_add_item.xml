@@ -30,11 +30,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="fill_horizontal"
-            android:layout_marginTop="@dimen/attribute_button_space"
+            android:layout_marginTop="@dimen/attribute_margin"
             android:layout_column="0"
             android:layout_row="0"
             android:gravity="center"
-            android:hint="@string/newitem_name"
+            android:inputType="textCapSentences|textAutoCorrect"
+            android:hint="@string/item_name"
             android:singleLine="true"
             android:maxLength="29"
             android:textColorHint="@color/hintColor" />
@@ -43,13 +44,12 @@
             android:id="@+id/newitem_add"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/attribute_button_space"
+            android:layout_marginTop="@dimen/attribute_margin"
             android:layout_column="1"
             android:layout_row="0"
             android:text="@string/add"
             android:textColor="@android:color/white"
             android:background="@color/primaryColorLight" />
-
 
     </GridLayout>
 
@@ -78,8 +78,8 @@
             android:layout_row="0"
             android:singleLine="true"
             android:maxLength="15"
-            android:inputType="numberDecimal"
-            android:digits="0123456789." />
+            android:inputType="numberDecimal|numberSigned"
+            android:digits="0123456789.-" />
 
         <TextView
             android:layout_width="wrap_content"

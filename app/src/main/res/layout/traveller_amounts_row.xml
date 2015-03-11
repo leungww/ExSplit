@@ -28,6 +28,7 @@
         android:inputType="numberDecimal"
         android:digits="0123456789."
         android:ems="6"
+        android:imeOptions="actionNext"
         android:hint="@string/paid"
         android:textColorHint="@color/hintColor"/>
 

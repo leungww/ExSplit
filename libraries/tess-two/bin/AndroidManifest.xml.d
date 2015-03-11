@@ -1,2 +1,2 @@
-C:\Users\solo\Downloads\tess-two-master\tess-two-master\tess-two\bin\AndroidManifest.xml : \
-C:\Users\solo\Downloads\tess-two-master\tess-two-master\tess-two\AndroidManifest.xml \
+C:\Users\User\Documents\GitHub\tess\tess-two\bin\AndroidManifest.xml : \
+C:\Users\User\Documents\GitHub\tess\tess-two\AndroidManifest.xml \

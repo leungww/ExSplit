@@ -72,13 +72,11 @@ public class ActivityDBAdapter {
             int isSystemGenerated = cursor.getInt(index);
             index = cursor.getColumnIndex(activityDBHelper.OBJECT_ID);
             long objectId = cursor.getLong(index);
-            try {
-                Activity activity = new Activity(_id, traveller, createdDate, category, description, isSystemGenerated, objectId);
-                activities.add(activity);
-            } catch (ParseException e) {
-            }
+            Activity activity = new Activity(_id, traveller, createdDate, category, description, isSystemGenerated, objectId);
+            activities.add(activity);
         }
         cursor.close();
+        db.close();
         return activities;
     }
 

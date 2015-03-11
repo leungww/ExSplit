@@ -228,7 +228,7 @@ public class CreateANewTripFragment extends Fragment {
                 String createdDate = new SimpleDateFormat(Trip.DATE_FORMAT).format(new Date());
                 activityDBAdapter.insertAll(travellers_id, createdDate, ACTIVITY_CATEGORY,
                         ACTIVITY_DESCRIPTION+name, ACTIVITY_IS_SYSTEM_GENERATED, trip_id);
-                Toast toast = Toast.makeText(getActivity(), "Trip has been created", Toast.LENGTH_SHORT);
+                Toast toast = Toast.makeText(getActivity(), "Trip "+name+" has been created", Toast.LENGTH_LONG);
                 toast.show();
                 FragmentTransaction transaction = getFragmentManager().beginTransaction();
                 Fragment newFragment = new AddANewBillStep1Fragment();

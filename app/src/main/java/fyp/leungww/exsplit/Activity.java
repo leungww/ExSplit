@@ -1,23 +1,20 @@
 package fyp.leungww.exsplit;
 
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 public class Activity {
     private long _id;
     private long traveller;
-    private Date createdDate;
+    private String createdDate;
     private String category;
     private String description;
     private boolean isSystemGenerated;
     private long objectId;
 
-    public Activity(long _id, long traveller, String createdDate, String category, String description, int isSystemGenerated, long objectId) throws ParseException {
+    public Activity(long _id, long traveller, String createdDate, String category, String description, int isSystemGenerated, long objectId) {
         this._id = _id;
         this.traveller = traveller;
-        this.createdDate = new SimpleDateFormat(Trip.DATE_FORMAT).parse(createdDate);
+        this.createdDate = createdDate;
         this.category = category;
         this.description = description;
         if(isSystemGenerated == 0){
@@ -36,7 +33,7 @@ public class Activity {
         return traveller;
     }
 
-    public Date getCreatedDate() {
+    public String getCreatedDate() {
         return createdDate;
     }
 

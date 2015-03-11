@@ -65,6 +65,7 @@ public class TravellerDBAdapter {
             traveller = new Traveller(_id, name, fbUserId);
         }
         cursor.close();
+        db.close();
         return traveller;
     }
 
@@ -83,6 +84,7 @@ public class TravellerDBAdapter {
             traveller = new Traveller(_id, name, fbUserId);
         }
         cursor.close();
+        db.close();
         return traveller;
     }
 
@@ -101,6 +103,7 @@ public class TravellerDBAdapter {
             travellers.append(_id+" "+name+" "+fbUserId);
         }
         cursor.close();
+        db.close();
         return travellers.toString();
     }
 

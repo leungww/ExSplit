@@ -29,7 +29,7 @@ android {
 allprojects {
     repositories {
         mavenCentral()
-        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+        maven { url "https://oss.sonatype.org/content/repositories/snapshots/"}
     }
 }
 
@@ -38,6 +38,5 @@ dependencies {
     compile 'com.android.support:appcompat-v7:21.0.3'
     compile 'com.android.support:recyclerview-v7:21.0.0'
     compile 'com.facebook.android:facebook-android-sdk:3.22.0'
-    compile 'com.michaelpardo:activeandroid:3.1.0-SNAPSHOT'
     compile project(':libraries:tess-two')
 }

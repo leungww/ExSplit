@@ -110,8 +110,13 @@ public class AddANewBillStep2Activity extends ActionBarActivity {
             String amount_string = editTexts.get(index).getText().toString();
             double amount;
             if (amount_string.length() > 0) {
-                amount = Double.parseDouble(amount_string);
-                sum = sum.add(BigDecimal.valueOf(amount));
+                try {
+                    amount = Double.parseDouble(amount_string);
+                    sum = sum.add(BigDecimal.valueOf(amount));
+                }catch(NumberFormatException e){
+                    errors.add("Invalid amount");
+                    amount = 0.0;
+                }
             }else{
                 amount = 0.0;
             }

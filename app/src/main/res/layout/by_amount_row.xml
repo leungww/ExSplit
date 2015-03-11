@@ -20,9 +20,10 @@
         android:layout_marginTop="@dimen/attribute_margin"
         android:gravity="center_horizontal"
         android:maxLength="10"
-        android:inputType="numberDecimal"
-        android:digits="0123456789."
+        android:inputType="numberDecimal|numberSigned"
+        android:digits="0123456789.-"
         android:ems="6"
+        android:imeOptions="actionNext"
         android:hint="@string/amount"
         android:textColorHint="@color/hintColor"/>
 
