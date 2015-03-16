@@ -50,6 +50,7 @@ public class AccountDBAdapter {
             account = new Account(_id, holder, currency, balance);
         }
         cursor.close();
+        db.close();
         return account;
     }
 
@@ -70,15 +71,20 @@ public class AccountDBAdapter {
             accounts.add(new Account(_id, holder, currency, balance));
         }
         cursor.close();
+        db.close();
         return accounts;
     }
 
     public void updateBalances(List<Long> holders, String currency, List<Double> amounts){
+        List<Account> accounts = new ArrayList<>();
+        for(Long holder:holders){
+            accounts.add(getAccount(holder, currency));
+        }
         SQLiteDatabase db = accountDBHelper.getWritableDatabase();
         db.beginTransaction();
         try {
             for(int index=0;index<holders.size();index++){
-                Account account = getAccount(holders.get(0), currency);
+                Account account = accounts.get(index);
                 if(account != null){
                     BigDecimal amountBD = BigDecimal.valueOf(amounts.get(index));
                     double balance = account.getBalance();

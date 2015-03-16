@@ -8,6 +8,7 @@
     tools:context="fyp.leungww.exsplit.NavigationDrawerFragment">
 
     <LinearLayout
+        android:id="@+id/drawer_user"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/item_border"

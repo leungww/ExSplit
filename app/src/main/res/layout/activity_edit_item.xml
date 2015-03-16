@@ -35,8 +35,8 @@
             android:layout_marginTop="@dimen/attribute_margin"
             android:layout_row="0"
             android:gravity="center"
-            android:inputType="textCapSentences|textAutoCorrect"
             android:hint="@string/item_name"
+            android:inputType="textCapSentences"
             android:maxLength="29"
             android:singleLine="true"
             android:textColorHint="@color/hintColor" />

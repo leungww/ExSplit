@@ -20,30 +20,22 @@ import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.util.Log;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.googlecode.leptonica.android.AdaptiveMap;
 import com.googlecode.leptonica.android.Binarize;
 import com.googlecode.leptonica.android.Convert;
-import com.googlecode.leptonica.android.Enhance;
 import com.googlecode.leptonica.android.Pix;
 import com.googlecode.leptonica.android.ReadFile;
 import com.googlecode.leptonica.android.Rotate;
 import com.googlecode.leptonica.android.Skew;
-import com.googlecode.leptonica.android.WriteFile;
 import com.googlecode.tesseract.android.TessBaseAPI;
-
-import org.w3c.dom.Text;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -54,9 +46,7 @@ import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -82,8 +72,10 @@ public class SelectPhotoActivity extends ActionBarActivity {
     private List<Long> travellers_id;
     private List<String> travellers_name;
 
-    private List<String> items_name = new ArrayList<>();
-    private List<Double> items_price = new ArrayList<>();
+    private List<String> items_name_eventSplit = new ArrayList<>();
+    private List<Double> items_price_evenSplit = new ArrayList<>();
+    private List<String> items_name_byAmount = new ArrayList<>();
+    private List<Double> items_price_byAmount = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,7 +101,7 @@ public class SelectPhotoActivity extends ActionBarActivity {
                 Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 if (intent.resolveActivity(getPackageManager()) != null) {
                     try {
-                        createPhotoFile();
+                        cameraFile = createPhotoFile();
                         intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(cameraFile));
                         intent.putExtra("scale", true);
                         intent.putExtra("return-data", false);
@@ -170,16 +162,16 @@ public class SelectPhotoActivity extends ActionBarActivity {
     }
 
     private void addItems(){
-        if(items_name.isEmpty() || items_price.isEmpty()){
+        if((items_name_eventSplit.isEmpty() || items_price_evenSplit.isEmpty()) && (items_name_byAmount.isEmpty() || items_price_byAmount.isEmpty())){
             Toast toast = Toast.makeText(this, "No item to add", Toast.LENGTH_SHORT);
             toast.show();
         }else{
             List<List<Double>> items_amounts = new ArrayList<>();
             List<String> items_amounts_string = new ArrayList<>();
             BigDecimal sizeBD = BigDecimal.valueOf(travellers_id.size());
-            for(int index=0;index<items_price.size();index++){
+            for(int index=0;index<items_price_evenSplit.size();index++){
                 List<Double> amounts = new ArrayList<>();
-                BigDecimal priceBD = BigDecimal.valueOf(items_price.get(index));
+                BigDecimal priceBD = BigDecimal.valueOf(items_price_evenSplit.get(index));
                 BigDecimal evenAmountBD = priceBD.divide(sizeBD, AddItemActivity.EVEN_SPLIT_ROUNDING_DP, BigDecimal.ROUND_HALF_UP);
                 double evenAmount = evenAmountBD.doubleValue();
                 BigDecimal lastAmountBD = priceBD.subtract(evenAmountBD.multiply(sizeBD.subtract(BigDecimal.ONE)));
@@ -198,7 +190,7 @@ public class SelectPhotoActivity extends ActionBarActivity {
                 items_amounts.add(amounts);
                 items_amounts_string.add(amounts_string);
             }
-            ItemsParcelable itemsParcelable = new ItemsParcelable(travellers_id, items_name, items_price, items_amounts, items_amounts_string);
+            ItemsParcelable itemsParcelable = new ItemsParcelable(travellers_id, items_name_eventSplit, items_price_evenSplit, items_amounts, items_amounts_string,items_name_byAmount,items_price_byAmount);
             Intent resultIntent = new Intent();
             resultIntent.putExtra(ITEMS_PARCELABLE,itemsParcelable);
             setResult(RESULT_OK, resultIntent);
@@ -271,12 +263,12 @@ public class SelectPhotoActivity extends ActionBarActivity {
         return intent;
     }
 
-    private void createPhotoFile() throws IOException {
+    private File createPhotoFile() throws IOException {
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String fileName = "Receipt_" + timeStamp;
         String directoryPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).toString()+"/Camera/";
         File directory = new File(directoryPath);
-        cameraFile = File.createTempFile(fileName, ".jpg", directory);
+        return File.createTempFile(fileName, ".jpg", directory);
     }
 
     private Uri getPhotoUri(){
@@ -293,9 +285,12 @@ public class SelectPhotoActivity extends ActionBarActivity {
         Pattern pattern = Pattern.compile("([+-]?[0-9]*[\\s]*[\\.\\,]?[0-9\\s]+$)");
         LayoutInflater inflater = getLayoutInflater();
         selectphoto_item_list.removeAllViews();
-        items_name = new ArrayList<>();
-        items_price = new ArrayList<>();
-        List<View> item_rows_partial_invalid = new ArrayList<>();
+        items_name_eventSplit = new ArrayList<>();
+        items_price_evenSplit = new ArrayList<>();
+        items_name_byAmount = new ArrayList<>();
+        items_price_byAmount = new ArrayList<>();
+        List<View> item_rows_evenSplit = new ArrayList<>();
+        List<View> item_rows_byAmount = new ArrayList<>();
         for(String line:lines){
             Matcher matcher = pattern.matcher(line);
             int beginIndex = 0;
@@ -317,15 +312,16 @@ public class SelectPhotoActivity extends ActionBarActivity {
                         item_currency.setText(currencyCodeSymbol);
                         TextView item_price = (TextView) item_row_partial.findViewById(R.id.item_price);
                         item_price.setText(price+"");
-                        if(evenAmountBD.doubleValue() != 0 && lastAmountBD.doubleValue() != 0){
-                            items_name.add(name);
-                            items_price.add(price);
-                            selectphoto_item_list.addView(item_row_partial);
+                        if((price > 0 && evenAmountBD.doubleValue() > 0 && lastAmountBD.doubleValue() > 0) ||
+                                (price < 0 && evenAmountBD.doubleValue() < 0 && lastAmountBD.doubleValue() < 0)){
+                            items_name_eventSplit.add(name);
+                            items_price_evenSplit.add(price);
+                            item_rows_evenSplit.add(item_row_partial);
                         }else{
-                            item_name.setTextColor(getResources().getColor(R.color.hintColor));
-                            item_currency.setTextColor(getResources().getColor(R.color.hintColor));
-                            item_price.setTextColor(getResources().getColor(R.color.hintColor));
-                            item_rows_partial_invalid.add(item_row_partial);
+                            item_name.setTextColor(getResources().getColor(R.color.primaryColorLight));
+                            items_name_byAmount.add(name);
+                            items_price_byAmount.add(price);
+                            item_rows_byAmount.add(item_row_partial);
                         }
                     }
                 }catch(NumberFormatException e){
@@ -333,12 +329,21 @@ public class SelectPhotoActivity extends ActionBarActivity {
                 }
             }
         }
-        if(item_rows_partial_invalid.size()>0){
+        if(item_rows_evenSplit.size()>0){
             TextView note_invalid_items = new TextView(SelectPhotoActivity.this);
-            note_invalid_items.setTextColor(getResources().getColor(R.color.hintColor));
-            note_invalid_items.setText(getString(R.string.note_items_invalid));
+            note_invalid_items.setTextColor(getResources().getColor(R.color.primaryColorDark));
+            note_invalid_items.setText(getString(R.string.note_items_even_split));
             selectphoto_item_list.addView(note_invalid_items);
-            for(View item_row:item_rows_partial_invalid){
+            for(View item_row:item_rows_evenSplit){
+                selectphoto_item_list.addView(item_row);
+            }
+        }
+        if(item_rows_byAmount.size()>0){
+            TextView note_invalid_items = new TextView(SelectPhotoActivity.this);
+            note_invalid_items.setTextColor(getResources().getColor(R.color.primaryColorLight));
+            note_invalid_items.setText(getString(R.string.note_items_by_amount));
+            selectphoto_item_list.addView(note_invalid_items);
+            for(View item_row:item_rows_byAmount){
                 selectphoto_item_list.addView(item_row);
             }
         }
@@ -490,37 +495,50 @@ public class SelectPhotoActivity extends ActionBarActivity {
 
 class ItemsParcelable implements Parcelable {
     private List<Long> travellers_id;
-    private List<String> items_name;
-    private List<Double> items_price;
-    private List<List<Double>> items_amounts;
-    private List<String> items_amounts_string;
+    private List<String> items_name_evenSplit;
+    private List<Double> items_price_evenSplit;
+    private List<List<Double>> items_amounts_evenSplit;
+    private List<String> items_amounts_string_evenSplit;
+    private List<String> items_name_byAmount;
+    private List<Double> items_price_byAmount;
 
-    public ItemsParcelable(List<Long> travellers_id, List<String> items_name, List<Double> items_price, List<List<Double>> items_amounts, List<String> items_amounts_string){
+    public ItemsParcelable(List<Long> travellers_id, List<String> items_name_evenSplit, List<Double> items_price_evenSplit,
+                           List<List<Double>> items_amounts_evenSplit, List<String> items_amounts_string_evenSplit, List<String> items_name_byAmount, List<Double> items_price_byAmount){
         this.travellers_id = travellers_id;
-        this.items_name = items_name;
-        this.items_price = items_price;
-        this.items_amounts  = items_amounts;
-        this.items_amounts_string = items_amounts_string;
+        this.items_name_evenSplit = items_name_evenSplit;
+        this.items_price_evenSplit = items_price_evenSplit;
+        this.items_amounts_evenSplit  = items_amounts_evenSplit;
+        this.items_amounts_string_evenSplit = items_amounts_string_evenSplit;
+        this.items_name_byAmount = items_name_byAmount;
+        this.items_price_byAmount = items_price_byAmount;
     }
 
     public List<Long> getTravellers_id(){
         return travellers_id;
     }
 
-    public List<String> getItems_name(){
-        return items_name;
+    public List<String> getItems_name_evenSplit(){
+        return items_name_evenSplit;
     }
 
-    public List<Double> getItems_price(){
-        return items_price;
+    public List<Double> getItems_price_evenSplit(){
+        return items_price_evenSplit;
     }
 
-    public List<List<Double>> getItems_amounts(){
-        return items_amounts;
+    public List<List<Double>> getItems_amounts_evenSplit(){
+        return items_amounts_evenSplit;
     }
 
-    public List<String> getItems_amounts_string(){
-        return items_amounts_string;
+    public List<String> getItems_amounts_string_evenSplit(){
+        return items_amounts_string_evenSplit;
+    }
+
+    public List<String> getItems_name_byAmount(){
+        return items_name_byAmount;
+    }
+
+    public List<Double> getItems_price_byAmount(){
+        return items_price_byAmount;
     }
 
     @Override
@@ -531,13 +549,15 @@ class ItemsParcelable implements Parcelable {
     @Override
     public void writeToParcel(Parcel out, int flags) {
         out.writeList(travellers_id);
-        out.writeList(items_name);
-        out.writeList(items_price);
-        out.writeInt(items_amounts.size());
-        for (List<Double> item_amounts: items_amounts) {
+        out.writeList(items_name_evenSplit);
+        out.writeList(items_price_evenSplit);
+        out.writeInt(items_amounts_evenSplit.size());
+        for (List<Double> item_amounts: items_amounts_evenSplit) {
             out.writeList(item_amounts);
         }
-        out.writeList(items_amounts_string);
+        out.writeList(items_amounts_string_evenSplit);
+        out.writeList(items_name_byAmount);
+        out.writeList(items_price_byAmount);
     }
 
     public static final Parcelable.Creator<ItemsParcelable> CREATOR = new Parcelable.Creator<ItemsParcelable>() {
@@ -553,18 +573,22 @@ class ItemsParcelable implements Parcelable {
     private ItemsParcelable(Parcel in) {
         travellers_id = new ArrayList<>();
         travellers_id = in.readArrayList(Long.class.getClassLoader());
-        items_name = new ArrayList<>();
-        items_name = in.readArrayList(String.class.getClassLoader());
-        items_price = new ArrayList<>();
-        items_price = in.readArrayList(Double.class.getClassLoader());
+        items_name_evenSplit = new ArrayList<>();
+        items_name_evenSplit = in.readArrayList(String.class.getClassLoader());
+        items_price_evenSplit = new ArrayList<>();
+        items_price_evenSplit = in.readArrayList(Double.class.getClassLoader());
         int size = in.readInt();
-        items_amounts = new ArrayList<>();
+        items_amounts_evenSplit = new ArrayList<>();
         for (int i = 0; i < size; i++) {
             List<Double> item_amounts = new ArrayList<>();
             item_amounts = in.readArrayList(Double.class.getClassLoader());
-            items_amounts.add(item_amounts);
+            items_amounts_evenSplit.add(item_amounts);
         }
-        items_amounts_string = new ArrayList<>();
-        items_amounts_string = in.readArrayList(String.class.getClassLoader());
+        items_amounts_string_evenSplit = new ArrayList<>();
+        items_amounts_string_evenSplit = in.readArrayList(String.class.getClassLoader());
+        items_name_byAmount = new ArrayList<>();
+        items_name_byAmount = in.readArrayList(String.class.getClassLoader());
+        items_price_byAmount = new ArrayList<>();
+        items_price_byAmount = in.readArrayList(Double.class.getClassLoader());
     }
 }

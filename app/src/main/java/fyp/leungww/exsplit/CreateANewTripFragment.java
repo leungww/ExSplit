@@ -46,7 +46,7 @@ import java.util.List;
 public class CreateANewTripFragment extends Fragment {
     public static final String FROM_DATE_FRAGMENT_TAG="fromDatePicker";
     public static final String TO_DATE_FRAGMENT_TAG="toDatePicker";
-    private static final List<String> PERMISSIONS = new ArrayList<String>() {
+    public static final List<String> FB_READ_PERMISSIONS = new ArrayList<String>() {
         {
             add("user_friends");
             add("public_profile");
@@ -308,7 +308,7 @@ public class CreateANewTripFragment extends Fragment {
 
     private boolean ensureOpenSession() {
         if (Session.getActiveSession() == null || !Session.getActiveSession().isOpened()) {
-            Session.openActiveSession(getActivity(), true, PERMISSIONS, new Session.StatusCallback() {
+            Session.openActiveSession(getActivity(), true, FB_READ_PERMISSIONS, new Session.StatusCallback() {
                 @Override
                 public void call(Session session, SessionState state, Exception exception) {
                     onSessionStateChange(session, state, exception);
@@ -321,7 +321,7 @@ public class CreateANewTripFragment extends Fragment {
 
     private boolean hasNecessaryPermissions(Session session) {
         if (session != null && session.getPermissions() != null) {
-            for (String requestedPerm : PERMISSIONS) {
+            for (String requestedPerm : FB_READ_PERMISSIONS) {
                 if (!session.getPermissions().contains(requestedPerm)) {
                     return false;
                 }
@@ -332,9 +332,9 @@ public class CreateANewTripFragment extends Fragment {
     }
 
     private List<String> getMissingPermissions(Session session) {
-        List<String> missingPerms = new ArrayList<String>(PERMISSIONS);
+        List<String> missingPerms = new ArrayList<String>(FB_READ_PERMISSIONS);
         if (session != null && session.getPermissions() != null) {
-            for (String requestedPerm : PERMISSIONS) {
+            for (String requestedPerm : FB_READ_PERMISSIONS) {
                 if (session.getPermissions().contains(requestedPerm)) {
                     missingPerms.remove(requestedPerm);
                 }

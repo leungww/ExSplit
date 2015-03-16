@@ -1,0 +1,110 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:facebook="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/fragment_user_profile"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="fyp.leungww.exsplit.UserProfileFragment">
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize" />
+
+    <GridLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/item_border"
+        android:rowCount="2"
+        android:columnCount="2"
+        android:orientation="vertical">
+
+        <com.facebook.widget.ProfilePictureView
+            android:id="@+id/userprofile_user_picture"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/attribute_margin"
+            android:layout_row="0"
+            android:layout_column="0"
+            android:layout_rowSpan="2"
+            facebook:preset_size="normal" />
+
+        <TextView
+            android:id="@+id/userprofile_username"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/attribute_margin"
+            android:layout_marginStart="@dimen/attribute_margin"
+            android:layout_marginLeft="@dimen/attribute_margin"
+            android:layout_row="0"
+            android:layout_column="1"
+            android:textColor="@color/primaryColor"
+            android:text="@string/username"
+            android:textSize="18sp" />
+
+        <com.facebook.widget.LoginButton
+            android:id="@+id/authButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="fill_horizontal|center_vertical"
+            android:layout_marginStart="@dimen/attribute_margin"
+            android:layout_marginLeft="@dimen/attribute_margin"
+            android:layout_marginTop="@dimen/attribute_margin"
+            android:layout_row="1"
+            android:layout_column="1" />
+
+    </GridLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:isScrollContainer="false">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/attribute_margin"
+                android:text="@string/paid_out"/>
+
+            <LinearLayout
+                android:id="@+id/userprofile_account_balances"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/attribute_margin"
+                android:text="@string/friends_owe_you"/>
+
+            <LinearLayout
+                android:id="@+id/userprofile_friends_owe"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/attribute_margin"
+                android:text="@string/owe_friends"/>
+
+            <LinearLayout
+                android:id="@+id/userprofile_owe_friends"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>

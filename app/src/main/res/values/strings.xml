@@ -21,10 +21,8 @@
     <string name="europe">Europe</string>
     <string name="uk">United Kingdom</string>
     <string name="us">United States</string>
-    <string name="date_format">Day-Month-Year</string>
     <string name="add_via_fb">Add via Facebook</string>
     <string name="save">Save</string>
-    <string name="none">None</string>
     <string name="title_activity_add_travellers">AddTravellersActivity</string>
     <string name="exception">Exception: %1$s</string>
     <string name="title_activity_add_traveller">Add Travellers via Facebook</string>
@@ -34,13 +32,11 @@
     <string name="next">Next</string>
     <string name="home">Home</string>
     <string name="add_a_new_bill">Add a new bill</string>
-    <string name="add_item_express">Add item express</string>
     <string name="create_a_new_trip">Create a new trip</string>
 
     <string-array name="app_bar_titles">
         <item>@string/home</item>
         <item>@string/add_a_new_bill</item>
-        <item>@string/add_item_express</item>
         <item>@string/create_a_new_trip</item>
     </string-array>
     <string-array name="newbill_category">
@@ -51,7 +47,6 @@
         <item>Entertainment and Recreation</item>
     </string-array>
 
-    <string name="number_zero">0</string>
     <string name="shared_between">Shared between</string>
     <string name="add">Add</string>
     <string name="category">Category</string>
@@ -78,7 +73,6 @@
     <string name="needs">Needs</string>
     <string name="paid">Paid</string>
     <string name="traveller">Traveller</string>
-    <string name="title_activity_ocrtest">OCRTest</string>
     <string name="sort_by">Sort by</string>
     <string name="title_activity_the_bill">The bill</string>
     <string name="select_photo">Select photo</string>
@@ -88,8 +82,12 @@
     <string name="gallery">Gallery</string>
     <string name="recognised_text">Recognised text</string>
     <string name="activity_log">Activity log</string>
-    <string name="note_items">Note: Price of each item below will be split evenly between all travellers in the selected trip</string>
-    <string name="note_items_invalid">Note: Item(s) below will not be added as price(s) cannot be split evenly between all travellers in the selected trip</string>
+    <string name="note_items_even_split">Note: Price of each item below will be split evenly between all travellers in the selected trip</string>
+    <string name="note_items_by_amount">Note: Item(s) below are presumed being purchased by the user as the price(s) cannot be split evenly</string>
     <string name="item_price">Item price</string>
+    <string name="user_profile">User profile</string>
+    <string name="paid_out">Paid out</string>
+    <string name="friends_owe_you">Friends owe you</string>
+    <string name="owe_friends">Owe friends</string>
 
 </resources>

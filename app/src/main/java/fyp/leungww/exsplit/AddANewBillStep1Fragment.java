@@ -1,7 +1,6 @@
 package fyp.leungww.exsplit;
 
 
-import android.app.*;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -10,12 +9,12 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.v4.app.*;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.text.format.Time;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,26 +22,27 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.RadioGroup;
 import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
 
 import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Currency;
 import java.util.HashMap;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
+import java.util.Queue;
+import java.util.concurrent.TimeUnit;
 
 
 public class AddANewBillStep1Fragment extends Fragment implements ItemAdapter.ClickListener{
@@ -84,13 +84,26 @@ public class AddANewBillStep1Fragment extends Fragment implements ItemAdapter.Cl
     private BillDBAdapter billDBAdapter;
     private OweDBAdapter oweDBAdapter;
 
+    private long startTime;
+
     public AddANewBillStep1Fragment() {
         // Required empty public constructor
     }
 
     @Override
+    public void onDestroy(){
+        super.onDestroy();
+
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        /*Time time = new Time();
+        time.setToNow();
+        startTime = time.toMillis(false);
+        Log.i("Add a new bill", "start");*/
+        startTime = Calendar.getInstance().getTimeInMillis();
     }
 
 
@@ -297,7 +310,7 @@ public class AddANewBillStep1Fragment extends Fragment implements ItemAdapter.Cl
                     //Remove all other currencies in the newbill_currency spinner except the selected one
                     removeUnselectedCurrencies();
 
-                    ItemParcelable itemParcelable = (ItemParcelable) data.getParcelableExtra(AddItemActivity.ITEM_PARCELABLE);
+                    ItemParcelable itemParcelable = data.getParcelableExtra(AddItemActivity.ITEM_PARCELABLE);
                     String item_name = itemParcelable.getName();
                     Double item_price = itemParcelable.getPrice();
                     String item_split_way = itemParcelable.getSplitWay();
@@ -353,9 +366,60 @@ public class AddANewBillStep1Fragment extends Fragment implements ItemAdapter.Cl
                         activityDBAdapter.insertAll(travellers_id, createdDate, ACTIVITY_CATEGORY,
                                 description, ACTIVITY_IS_SYSTEM_GENERATED, bill_id);
                         accountDBAdapter.updateBalances(travellers_id, currency, amounts_paid);
-                        if(debtors_id.size() != 0 && creditors_id.size() != 0 && amounts_owed.size() != 0) {
-                            oweDBAdapter.insert(bill_id, debtors_id, creditors_id, amounts_owed);
+                        if(debtors_id.size() > 0 && creditors_id.size() > 0 && amounts_owed.size() > 0) {
+                            ListIterator<Long> debtors_idIterator = debtors_id.listIterator();
+                            ListIterator<Long> creditors_idIterator = creditors_id.listIterator();
+                            ListIterator<Double> amounts_owedIterator = amounts_owed.listIterator();
+                            List<Debt> debtsToDelete = new ArrayList<>();
+                            while(debtors_idIterator.hasNext() && creditors_idIterator.hasNext() && amounts_owedIterator.hasNext()){
+                                Long debtor = debtors_idIterator.next();
+                                Long creditor = creditors_idIterator.next();
+                                Double amountOwed = amounts_owedIterator.next();
+                                //Try to cancel out creditor's debts to debtor
+                                Queue<Debt> queue = oweDBAdapter.getDebts(currency, creditor, debtor);
+                                while(!queue.isEmpty()){
+                                    Debt debt=queue.peek();
+                                    BigDecimal amountDebtBD = BigDecimal.valueOf(debt.getAmountOwed());
+                                    BigDecimal amountOwedBD = BigDecimal.valueOf(amountOwed);
+                                    if(amountDebtBD.doubleValue() < amountOwedBD.doubleValue()) {
+                                        amountOwedBD = amountOwedBD.subtract(amountDebtBD);
+                                        amounts_owedIterator.set(amountOwedBD.doubleValue());
+                                        debtsToDelete.add(queue.poll());
+                                    }else if (amountDebtBD.doubleValue() == amountOwedBD.doubleValue()) {
+                                        debtsToDelete.add(queue.poll());
+                                        debtors_idIterator.remove();
+                                        creditors_idIterator.remove();
+                                        amounts_owedIterator.remove();
+                                        queue.clear();
+                                    }else{
+                                        amountDebtBD = amountDebtBD.subtract(amountOwedBD);
+                                        debt.setAmountOwed(amountDebtBD.doubleValue());
+                                        oweDBAdapter.updateAmountOwed(debt);
+                                        debtors_idIterator.remove();
+                                        creditors_idIterator.remove();
+                                        amounts_owedIterator.remove();
+                                        queue.clear();
+                                    }
+                                }
+                            }
+                            if(debtsToDelete.size() > 0){
+                                oweDBAdapter.deleteOwes(debtsToDelete);
+                            }
+                            if(debtors_id.size() > 0 && creditors_id.size() > 0 && amounts_owed.size() > 0) {
+                                oweDBAdapter.insert(bill_id, currency, debtors_id, creditors_id, amounts_owed);
+                            }
                         }
+                        //TODO: build traker
+                        long endTime = Calendar.getInstance().getTimeInMillis();
+                        long timeSpent = endTime-startTime;
+                        Tracker tracker = ((ExSplitApplication) getActivity().getApplication()).getTracker(ExSplitApplication.TrackerName.APP_TRACKER);
+                        tracker.send(new HitBuilders.TimingBuilder()
+                                .setCategory(getString(R.string.add_a_new_bill))
+                                .setValue(timeSpent)
+                                .setVariable(description)
+                                .build());
+                        Log.i("Bill "+description, timeSpent+"ms");
+
                         Toast toast = Toast.makeText(getActivity(), "Bill "+description+" has been added", Toast.LENGTH_LONG);
                         toast.show();
                         android.support.v4.app.FragmentTransaction transaction = getFragmentManager().beginTransaction();
@@ -377,19 +441,19 @@ public class AddANewBillStep1Fragment extends Fragment implements ItemAdapter.Cl
                     //Remove all other currencies in the newbill_currency spinner except the selected one
                     removeUnselectedCurrencies();
 
-                    ItemsParcelable itemsParcelable = (ItemsParcelable) data.getParcelableExtra(SelectPhotoActivity.ITEMS_PARCELABLE);
+                    ItemsParcelable itemsParcelable = data.getParcelableExtra(SelectPhotoActivity.ITEMS_PARCELABLE);
                     List<Long> travellers_id = itemsParcelable.getTravellers_id();
-                    List<String> items_name = itemsParcelable.getItems_name();
+                    List<String> items_name_evenSplit = itemsParcelable.getItems_name_evenSplit();
                     String currencyCodeSymbol = (String) newbill_currency.getSelectedItem();
-                    List<Double> items_price = itemsParcelable.getItems_price();
-                    List<String> items_amounts_string = itemsParcelable.getItems_amounts_string();
-                    List<List<Double>> items_amounts = itemsParcelable.getItems_amounts();
-                    for(int index=0;index<items_name.size();index++){
-                        String item_name = items_name.get(index);
-                        Double item_price = items_price.get(index);
+                    List<Double> items_price_evenSplit = itemsParcelable.getItems_price_evenSplit();
+                    List<String> items_amounts_string_evenSplit = itemsParcelable.getItems_amounts_string_evenSplit();
+                    List<List<Double>> items_amounts_evenSplit = itemsParcelable.getItems_amounts_evenSplit();
+                    for(int index=0;index<items_name_evenSplit.size();index++){
+                        String item_name = items_name_evenSplit.get(index);
+                        Double item_price = items_price_evenSplit.get(index);
                         String item_split_way = getString(R.string.even_split);
-                        String amounts_string = items_amounts_string.get(index);
-                        List<Double> item_amountsList = items_amounts.get(index);
+                        String amounts_string = items_amounts_string_evenSplit.get(index);
+                        List<Double> item_amountsList = items_amounts_evenSplit.get(index);
                         Map<Long, Double> item_amounts = new HashMap<>();
                         for(int i=0;i<item_amountsList.size();i++){
                             item_amounts.put(travellers_id.get(i),item_amountsList.get(i));
@@ -398,6 +462,21 @@ public class AddANewBillStep1Fragment extends Fragment implements ItemAdapter.Cl
                         items.add(item);
                         adapter.add(item);
                     }
+
+                    List<String> items_name_byAmount = itemsParcelable.getItems_name_byAmount();
+                    List<Double> items_price_byAmount = itemsParcelable.getItems_price_byAmount();
+                    for(int index=0;index<items_name_byAmount.size();index++){
+                        String item_name = items_name_byAmount.get(index);
+                        Double item_price = items_price_byAmount.get(index);
+                        String item_split_way = getString(R.string.by_amount);
+                        String amounts_string = user.getName()+" ("+item_price+")";
+                        Map<Long, Double> item_amounts = new HashMap<>();
+                        item_amounts.put(user.get_id(),item_price);
+                        Item item = new Item(item_name, currencyCodeSymbol, item_price, item_split_way, item_amounts, amounts_string);
+                        items.add(item);
+                        adapter.add(item);
+                    }
+
                 }
                 break;
             }

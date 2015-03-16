@@ -25,10 +25,10 @@
             android:layout_marginTop="@dimen/attribute_margin"
             android:layout_row="0"
             android:gravity="center"
-            android:inputType="textCapSentences|textAutoCorrect"
             android:hint="@string/newtrip_name"
-            android:singleLine="true"
+            android:inputType="textCapSentences"
             android:maxLength="29"
+            android:singleLine="true"
             android:textColor="@color/primaryColor"
             android:textColorHint="@color/hintColor"
             android:textSize="18sp" />
@@ -40,9 +40,9 @@
             android:layout_column="1"
             android:layout_marginTop="@dimen/attribute_margin"
             android:layout_row="0"
+            android:background="@color/accentColor"
             android:text="@string/save"
-            android:textColor="@android:color/white"
-            android:background="@color/accentColor"/>
+            android:textColor="@android:color/white" />
     </GridLayout>
 
     <ScrollView
@@ -56,47 +56,31 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <GridLayout
+            <LinearLayout
+                android:id="@+id/linearLayout1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:columnCount="2"
                 android:orientation="horizontal"
-                android:rowCount="2">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_column="0"
-                    android:layout_row="0"
-                    android:text="@string/from" />
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true" >
 
                 <Button
                     android:id="@+id/newtrip_from"
-                    android:layout_width="wrap_content"
+                    android:layout_width="140dp"
                     android:layout_height="wrap_content"
-                    android:layout_column="1"
-                    android:layout_gravity="fill_horizontal"
-                    android:layout_row="0"
-                    android:gravity="center"
-                    android:text="@string/date_format" />
+                    android:text="@string/from" />
 
-                <TextView
+                <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_column="0"
-                    android:layout_row="1"
-                    android:text="@string/to" />
+                    android:src="@drawable/ic_airplanemode_on_grey600_48dp" />
 
                 <Button
                     android:id="@+id/newtrip_to"
-                    android:layout_width="wrap_content"
+                    android:layout_width="140dp"
                     android:layout_height="wrap_content"
-                    android:layout_column="1"
-                    android:layout_gravity="fill_horizontal"
-                    android:layout_row="1"
-                    android:gravity="center"
-                    android:text="@string/date_format" />
-            </GridLayout>
+                    android:text="@string/to" />
+            </LinearLayout>
 
             <TextView
                 android:layout_width="match_parent"
@@ -153,12 +137,12 @@
                 android:id="@+id/newtrip_add_travellers"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/attribute_margin"
+                android:layout_marginBottom="@dimen/attribute_margin"
                 android:layout_marginLeft="@dimen/button_margin"
                 android:layout_marginRight="@dimen/button_margin"
-                android:layout_marginBottom="@dimen/attribute_margin"
-                android:text="@string/add_via_fb"
+                android:layout_marginTop="@dimen/attribute_margin"
                 android:background="@color/com_facebook_blue"
+                android:text="@string/add_via_fb"
                 android:textColor="@android:color/white" />
 
             <LinearLayout

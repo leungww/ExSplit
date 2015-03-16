@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.support.v7.widget.Toolbar;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.facebook.Request;
@@ -35,8 +36,7 @@ import java.util.List;
 public class NavigationDrawerFragment extends Fragment implements DrawerAdapter.ClickListener{
     public static final String PREF_FILENAME="testpref";
     public static final String KEY_USER_LEARNED_DRAWER="user_learned_drawer";
-    public static final int[] ICONS={R.drawable.ic_home_white_48dp, R.drawable.ic_note_add_white_48dp,
-            R.drawable.ic_add_shopping_cart_white_48dp, R.drawable.ic_event_white_48dp};
+    public static final int[] ICONS={R.drawable.ic_home_white_48dp, R.drawable.ic_note_add_white_48dp, R.drawable.ic_event_white_48dp};
 
     private ActionBarDrawerToggle mDrawerToggle;
     private DrawerLayout mDrawerLayout;
@@ -44,6 +44,7 @@ public class NavigationDrawerFragment extends Fragment implements DrawerAdapter.
     private View containerView;
     private RecyclerView recyclerView;
     private DrawerAdapter adapter;
+    private LinearLayout drawer_user;
     private ProfilePictureView profilePictureView;
     private TextView userNameView;
     private Session.StatusCallback callback = new Session.StatusCallback() {
@@ -98,6 +99,20 @@ public class NavigationDrawerFragment extends Fragment implements DrawerAdapter.
         profilePictureView.setCropped(true);
         // Find the user's name view
         userNameView = (TextView) view.findViewById(R.id.fb_username);
+        drawer_user = (LinearLayout) view.findViewById(R.id.drawer_user);
+        drawer_user.setOnClickListener(new View.OnClickListener(){
+
+            @Override
+            public void onClick(View v) {
+                Fragment newFragment = new UserProfileFragment();
+                FragmentTransaction transaction = getFragmentManager().beginTransaction();
+                transaction.replace(R.id.container, newFragment);
+                transaction.commit();
+                mToolbar.setTitle(getString(R.string.user_profile));
+                mDrawerLayout.closeDrawer(containerView);
+            }
+        });
+        setUpUserProfile();
         Session session = Session.getActiveSession();
         if (session != null && session.isOpened()) {
             // Get the user's data
@@ -148,6 +163,17 @@ public class NavigationDrawerFragment extends Fragment implements DrawerAdapter.
         });
     }
 
+    private void setUpUserProfile(){
+        SharedPreferences sharedPreferences=getActivity().getSharedPreferences(ExSplitApplication.SHARED_PREF_FILE_USER_INFO, Context.MODE_PRIVATE);
+        long user_id = sharedPreferences.getLong(ExSplitApplication.SHARED_PREF_KEY_USER_ID,-1);
+        if(user_id > 0){
+            TravellerDBAdapter travellerDBAdapter = new TravellerDBAdapter(getActivity());
+            Traveller user = travellerDBAdapter.getTraveller(user_id);
+            profilePictureView.setProfileId(user.getFbUserId());
+            userNameView.setText(user.getName());
+        }
+    }
+
     public static void saveToPreferences(Context context, String preferenceName, String preferenceValue){
         SharedPreferences sharedPreferences=context.getSharedPreferences(PREF_FILENAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor=sharedPreferences.edit();
@@ -176,11 +202,6 @@ public class NavigationDrawerFragment extends Fragment implements DrawerAdapter.
                 transaction.commit();
                 break;
             case 2:
-                newFragment = new AddItemExpressStep1Fragment();
-                transaction.replace(R.id.container, newFragment);
-                transaction.commit();
-                break;
-            case 3:
                 newFragment = new CreateANewTripFragment();
                 transaction.replace(R.id.container, newFragment);
                 transaction.commit();
@@ -196,7 +217,10 @@ public class NavigationDrawerFragment extends Fragment implements DrawerAdapter.
             //Log.i(TAG, "Logged in to Facebook");
             makeMeRequest(session);
         } else if (state.isClosed()) {
-            //Log.i(TAG, "Logged out from Facebook");
+            if (session == null || !session.isOpened()){
+                profilePictureView.setProfileId(null);
+                userNameView.setText(getString(R.string.username));
+            }
         }
     }
 
@@ -245,7 +269,7 @@ public class NavigationDrawerFragment extends Fragment implements DrawerAdapter.
                     if (user != null) {
                         profilePictureView.setProfileId(user.getId());
                         userNameView.setText(user.getName());
-                        //saveToPreferences(getActivity(),KEY_FB_ID, user.getId());
+                        setUpUserProfile();
                     }
                 }
                 if (response.getError() != null) {

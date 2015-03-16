@@ -9,4 +9,8 @@
     <color name="toolbarSecondaryTextColor">#E0F2F1</color>
     <color name="drawerColor">#424242</color>
     <color name="drawerTextColor">#E0F2F1</color>
+    <color name="ukColor">#00247D</color>
+    <color name="usColor">#B22234</color>
+    <color name="franceColor">#0055A4</color>
+    <color name="canadaColor">#FF0000</color>
 </resources>

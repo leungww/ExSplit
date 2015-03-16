@@ -42,7 +42,9 @@ public class BillDBAdapter {
         }else{
             SQLiteDatabase itemDB = itemDBHelper.getWritableDatabase();
             SQLiteDatabase itemSplitDB = itemSplitDBHelper.getWritableDatabase();
+
             SQLiteDatabase paymentDB = paymentDBHelper.getWritableDatabase();
+
             itemDB.beginTransaction();
             itemSplitDB.beginTransaction();
             paymentDB.beginTransaction();

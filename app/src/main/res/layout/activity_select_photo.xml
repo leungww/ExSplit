@@ -69,15 +69,9 @@
         android:scrollbarStyle="insideInset"
         android:scrollbars="vertical"
         android:scrollHorizontally="false"
-        android:inputType="textMultiLine|textCapSentences|textAutoCorrect"
+        android:inputType="textMultiLine|textCapSentences"
         android:textSize="20sp"
         android:textColorHint="@color/hintColor"/>
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/note_items"
-        android:textColor="@color/accentColor"/>
 
     <GridLayout
         android:layout_width="match_parent"
@@ -116,7 +110,9 @@
             android:id="@+id/selectphoto_item_list"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"></LinearLayout>
+            android:orientation="vertical">
+
+        </LinearLayout>
     </ScrollView>
 
 </LinearLayout>

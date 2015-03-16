@@ -161,7 +161,7 @@ public class AddItemActivity extends ActionBarActivity {
                     double evenAmount = evenAmountBD.doubleValue();
                     BigDecimal lastAmountBD = priceBD.subtract(evenAmountBD.multiply(sizeBD.subtract(BigDecimal.ONE)));
                     double lastAmount = lastAmountBD.doubleValue();
-                    if(evenAmount == 0 || lastAmount == 0){
+                    if((price > 0 && (evenAmount <= 0 || lastAmount <= 0)) || (price < 0 && (evenAmount >= 0 || lastAmount >= 0))){
                         errors.add("Price cannot be split evenly between selected travellers");
                     }else{
                         for (Long traveller_id : travellers_even_split) {
