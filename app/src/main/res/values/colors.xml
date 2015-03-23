@@ -5,8 +5,12 @@
     <color name="primaryColorLight">#80CBC4</color>
     <color name="accentColor">#673AB7</color>
     <color name="hintColor">#9E9E9E</color>
-    <color name="toolbarPrimaryTextColor">#FFFFFF</color>
-    <color name="toolbarSecondaryTextColor">#E0F2F1</color>
+    <color name="grey_400">#BDBDBD</color>
+    <color name="grey_300">#E0E0E0</color>
+    <color name="indigo">#3F51B5</color>
+    <color name="indigo_900">#1A237E</color>
+    <color name="blue">#2196F3</color>
+    <color name="blue_900">#0D47A1</color>
     <color name="drawerColor">#424242</color>
     <color name="drawerTextColor">#E0F2F1</color>
     <color name="ukColor">#00247D</color>

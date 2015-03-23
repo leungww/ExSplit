@@ -24,7 +24,6 @@
         android:layout_centerVertical="true"
         android:padding="8dp"
         android:textSize="18sp"
-        android:textColor="@drawable/text_transition"
-        android:text="" />
+        android:textColor="@drawable/text_transition_drawer" />
 
 </RelativeLayout>

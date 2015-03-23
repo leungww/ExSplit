@@ -123,6 +123,47 @@ public class TripDBAdapter {
         return new ArrayList<Trip>(trips.values());
     }
 
+    public Trip getTrip(long id){
+        SQLiteDatabase db = tripDBHelper.getWritableDatabase();
+        String[] columns = {tripDBHelper.NAME, tripDBHelper.FROMDATE, tripDBHelper.TODATE, tripDBHelper.COUNTRIES};
+        String selection = tripDBHelper.ID+" =?";
+        String[] selectionArgs = {id+""};
+        Cursor cursor = db.query(tripDBHelper.TABLE_NAME, columns,selection,selectionArgs,null,null,null);
+        Trip trip = null;
+        while(cursor.moveToNext()){
+            int index = cursor.getColumnIndex(tripDBHelper.NAME);
+            String name = cursor.getString(index);
+            index = cursor.getColumnIndex(tripDBHelper.FROMDATE);
+            String fromDate = cursor.getString(index);
+            index = cursor.getColumnIndex(tripDBHelper.TODATE);
+            String toDate = cursor.getString(index);
+            index = cursor.getColumnIndex(tripDBHelper.COUNTRIES);
+            String countries = cursor.getString(index);
+            try {
+                trip = new Trip(id, name, fromDate, toDate, countries);
+                break;
+            } catch (ParseException e) {
+
+            }
+        }
+        cursor.close();
+
+        String[] columns1 = {tripDBHelper.TRAVELLER};
+        String selection1 = tripDBHelper.ID+" =?";
+        String[] selectionArgs1 = {id+""};
+        Cursor cursor1 = db.query(tripDBHelper.TABLE_NAME, columns1,selection1,selectionArgs1,null,null,null);
+        List<Long> travellers = new ArrayList<>();
+        while(cursor1.moveToNext()){
+            int index1 = cursor1.getColumnIndex(tripDBHelper.TRAVELLER);
+            long traveller_id = cursor1.getLong(index1);
+            travellers.add(traveller_id);
+        }
+        cursor1.close();
+        trip.setTravellers(travellers);
+        db.close();
+        return trip;
+    }
+
     public String getAll(){
         SQLiteDatabase db = tripDBHelper.getWritableDatabase();
         String[] columns = {tripDBHelper.PRIMARY_KEY, tripDBHelper.ID, tripDBHelper.NAME, tripDBHelper.FROMDATE, tripDBHelper.TODATE, tripDBHelper.COUNTRIES, tripDBHelper.TRAVELLER};

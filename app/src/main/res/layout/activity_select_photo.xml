@@ -3,9 +3,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
     tools:context="fyp.leungww.exsplit.SelectPhotoActivity">
 
@@ -19,100 +16,88 @@
 
     </RelativeLayout>
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/attribute_margin"
-        android:text="@string/select_receipt_from"/>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <Button
-            android:id="@+id/selectphoto_camera"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginRight="@dimen/attribute_margin"
-            android:layout_marginEnd="@dimen/attribute_margin"
-            android:text="@string/camera"
-            android:background="@color/primaryColorLight"
-            android:textColor="@android:color/white" />
-
-        <Button
-            android:id="@+id/selectphoto_gallery"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginLeft="@dimen/attribute_margin"
-            android:layout_marginStart="@dimen/attribute_margin"
-            android:text="@string/gallery"
-            android:background="@color/primaryColorDark"
-            android:textColor="@android:color/white" />
-
-    </LinearLayout>
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/recognised_text"/>
-
-    <EditText
-        android:id="@+id/selectphoto_recognised_text"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:lines="5"
-        android:gravity="start|top"
-        android:isScrollContainer="false"
-        android:scrollbarStyle="insideInset"
-        android:scrollbars="vertical"
-        android:scrollHorizontally="false"
-        android:inputType="textMultiLine|textCapSentences"
-        android:textSize="20sp"
-        android:textColorHint="@color/hintColor"/>
-
-    <GridLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:columnCount="2"
-        android:orientation="horizontal"
-        android:rowCount="1">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_column="0"
-            android:layout_row="0"
-            android:layout_gravity="fill_horizontal"
-            android:text="@string/items"/>
-
-        <Button
-            android:id="@+id/selectphoto_add"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_column="1"
-            android:layout_row="0"
-            android:background="@color/primaryColorDark"
-            android:text="@string/add"
-            android:textColor="@android:color/white" />
-
-    </GridLayout>
-
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
         android:isScrollContainer="false">
 
         <LinearLayout
-            android:id="@+id/selectphoto_item_list"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="fill_parent"
             android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/attribute_margin"
+                android:text="@string/select_receipt_from"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/selectphoto_camera"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginTop="@dimen/attribute_margin"
+                    android:layout_marginRight="@dimen/attribute_margin"
+                    android:layout_marginEnd="@dimen/attribute_margin"
+                    android:text="@string/camera"
+                    android:background="@drawable/button_transition_indigo"
+                    android:textColor="@android:color/white" />
+
+                <Button
+                    android:id="@+id/selectphoto_gallery"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginTop="@dimen/attribute_margin"
+                    android:layout_marginLeft="@dimen/attribute_margin"
+                    android:layout_marginStart="@dimen/attribute_margin"
+                    android:text="@string/gallery"
+                    android:background="@drawable/button_transition_blue"
+                    android:textColor="@android:color/white" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/selectphoto_item_list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/selectphoto_recognised_text_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/attribute_button_space"
+                android:text="@string/recognised_text"/>
+
+            <EditText
+                android:id="@+id/selectphoto_recognised_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="start|top"
+                android:inputType="textMultiLine|textCapSentences"
+                android:textColorHint="@color/hintColor"/>
+
+            <TextView
+                android:id="@+id/selectphoto_recognised_text_note"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/accentColor"
+                android:text="@string/note_recognised_text"/>
 
         </LinearLayout>
     </ScrollView>
-
 </LinearLayout>

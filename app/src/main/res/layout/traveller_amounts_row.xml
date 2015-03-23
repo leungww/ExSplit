@@ -29,7 +29,7 @@
         android:digits="0123456789."
         android:ems="6"
         android:imeOptions="actionNext"
-        android:hint="@string/paid"
+        android:hint="@string/amount_to_pay"
         android:textColorHint="@color/hintColor"/>
 
     <TextView

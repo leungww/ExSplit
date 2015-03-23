@@ -4,6 +4,8 @@
     android:id="@+id/fragment_user_profile"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
     android:orientation="vertical"
     tools:context="fyp.leungww.exsplit.UserProfileFragment">
 
@@ -69,7 +71,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/attribute_margin"
+                android:layout_marginTop="@dimen/attribute_button_space"
                 android:text="@string/paid_out"/>
 
             <LinearLayout
@@ -82,7 +84,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/attribute_margin"
+                android:layout_marginTop="@dimen/attribute_button_space"
                 android:text="@string/friends_owe_you"/>
 
             <LinearLayout
@@ -95,7 +97,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/attribute_margin"
+                android:layout_marginTop="@dimen/attribute_button_space"
                 android:text="@string/owe_friends"/>
 
             <LinearLayout

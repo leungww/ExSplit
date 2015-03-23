@@ -21,6 +21,10 @@ public class Item {
         this.amounts_string = amounts_string;
     }
 
+    public void setCurrencyCodeSymbol(String currencyCodeSymbol){
+        this.currencyCodeSymbol = currencyCodeSymbol;
+    }
+
     public String getName() {
         return name;
     }

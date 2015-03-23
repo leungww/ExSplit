@@ -12,24 +12,23 @@
     <string name="title_activity_login">Login</string>
     <string name="title_facebook_login">Facebook login</string>
     <string name="username">User</string>
-    <string name="newtrip_name">Trip name</string>
-    <string name="from">From</string>
-    <string name="to">To</string>
+    <string name="hint_newtrip_name">Enter trip name here</string>
+    <string name="departure_date">Departure date</string>
+    <string name="return_date">Return date</string>
     <string name="countries">Countries</string>
     <string name="travellers">Travellers</string>
     <string name="canada">Canada</string>
-    <string name="europe">Europe</string>
+    <string name="europe_excl_uk">Europe (excl. UK)</string>
     <string name="uk">United Kingdom</string>
     <string name="us">United States</string>
-    <string name="add_via_fb">Add via Facebook</string>
-    <string name="save">Save</string>
+    <string name="add_edit_friends_via_fb">Add/Edit friends via Facebook</string>
+    <string name="save_the_bill">Save the bill</string>
     <string name="title_activity_add_travellers">AddTravellersActivity</string>
     <string name="exception">Exception: %1$s</string>
     <string name="title_activity_add_traveller">Add Travellers via Facebook</string>
     <string name="error_dialog_title">Error</string>
     <string name="error_dialog_button_text">OK</string>
-    <string name="newbill_description">Bill description</string>
-    <string name="next">Next</string>
+    <string name="hint_newbill_description">Enter bill description here</string>
     <string name="home">Home</string>
     <string name="add_a_new_bill">Add a new bill</string>
     <string name="create_a_new_trip">Create a new trip</string>
@@ -47,7 +46,8 @@
         <item>Entertainment and Recreation</item>
     </string-array>
 
-    <string name="shared_between">Shared between</string>
+    <string name="shared_between_travellers_in">Shared between travellers in</string>
+    <string name="shared_n_between">Shared\nbetween</string>
     <string name="add">Add</string>
     <string name="category">Category</string>
     <string name="date">Date</string>
@@ -62,7 +62,7 @@
     <string name="title_activity_add_item">Add item</string>
     <string name="price">Price</string>
     <string name="way_of_splitting">Way of splitting</string>
-    <string name="add_item">Add item</string>
+    <string name="add_item_manually">Add item manually</string>
     <string name="currency">Currency</string>
     <string name="items">Items</string>
     <string name="title_activity_edit_item">Edit item</string>
@@ -71,23 +71,41 @@
     <string name="title_activity_add_anew_bill_step2">Add a new bill (continued)</string>
     <string name="total">Total</string>
     <string name="needs">Needs</string>
-    <string name="paid">Paid</string>
+    <string name="amount_to_pay">Amount to pay</string>
     <string name="traveller">Traveller</string>
     <string name="sort_by">Sort by</string>
     <string name="title_activity_the_bill">The bill</string>
-    <string name="select_photo">Select photo</string>
+    <string name="add_items_by_photo">Add items by photo</string>
     <string name="title_activity_select_photo">Select photo</string>
-    <string name="select_receipt_from">Select receipt from</string>
+    <string name="select_receipt_from">Get photo of receipt from</string>
     <string name="camera">Camera</string>
     <string name="gallery">Gallery</string>
     <string name="recognised_text">Recognised text</string>
     <string name="activity_log">Activity log</string>
     <string name="note_items_even_split">Note: Price of each item below will be split evenly between all travellers in the selected trip</string>
-    <string name="note_items_by_amount">Note: Item(s) below are presumed being purchased by the user as the price(s) cannot be split evenly</string>
+    <string name="note_items_by_amount">Note: Item(s) below are assumed being purchased by the user as the price(s) cannot be split evenly</string>
     <string name="item_price">Item price</string>
     <string name="user_profile">User profile</string>
     <string name="paid_out">Paid out</string>
     <string name="friends_owe_you">Friends owe you</string>
     <string name="owe_friends">Owe friends</string>
+    <string name="add_all">Add all</string>
+    <string name="example_recognised_text">Example: Apples 1.5</string>
+    <string name="note_welcome1">Welcome to ExSplit, the app that makes managing shared travel expenses easy!</string>
+    <string name="note_welcome2">Click the menu icon above and explore the features.</string>
+    <string name="error_login">Please first login with Facebook</string>
+    <string name="error_no_trip">Create a new trip to unveil more amazing features!</string>
+    <string name="bill_description">Bill description</string>
+    <string name="your_subtotal">Your subtotal</string>
+    <string name="your_paid_out">Your paid out</string>
+    <string name="create">Create</string>
+    <string name="next_save">Next/Save</string>
+    <string name="time_spent_add_bill">Bill %1$s: %1$s ms</string>
+    <string name="note_recognised_text">Note: You can edit the recognised text above, and change currency after adding all items</string>
+    <string name="select_all">Select all</string>
+    <string name="deselect_all">Deselect all</string>
+    <string name="hint">Hint</string>
+    <string name="hint_camera">Please ensure the photo to be taken is in correct orientation and texts are legible</string>
+    <string name="hint_crop">To enhance character recognition accuracy, please enlarge and crop out the area of item names and prices</string>
 
 </resources>

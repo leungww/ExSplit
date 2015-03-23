@@ -2,6 +2,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
     android:orientation="vertical"
     tools:context="fyp.leungww.exsplit.AddANewBillStep1">
 
@@ -24,9 +26,8 @@
             android:layout_gravity="fill_horizontal"
             android:layout_marginTop="@dimen/attribute_margin"
             android:layout_row="0"
-            android:gravity="center"
-            android:hint="@string/newbill_description"
-            android:maxLength="29"
+            android:hint="@string/hint_newbill_description"
+            android:maxLength="20"
             android:inputType="textCapSentences"
             android:singleLine="true"
             android:textColor="@color/primaryColor"
@@ -40,23 +41,17 @@
             android:layout_column="1"
             android:layout_marginTop="@dimen/attribute_margin"
             android:layout_row="0"
-            android:background="@color/accentColor"
-            android:text="@string/next"
+            android:background="@drawable/button_transition_accent_color"
+            android:text="@string/next_save"
             android:textColor="@android:color/white" />
     </GridLayout>
-
-    <Button
-        android:id="@+id/newbill_date"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/date"/>
 
     <GridLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:columnCount="2"
         android:orientation="horizontal"
-        android:rowCount="3">
+        android:rowCount="4">
 
         <TextView
             android:layout_width="wrap_content"
@@ -82,39 +77,48 @@
             android:layout_column="0"
             android:layout_row="1"
             android:layout_marginTop="@dimen/attribute_margin"
-            android:text="@string/shared_between" />
+            android:layout_rowSpan="2"
+            android:text="@string/shared_n_between" />
 
         <Spinner
             android:id="@+id/newbill_trip"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_column="1"
-            android:layout_gravity="fill_horizontal"
+            android:layout_gravity="fill_horizontal|fill_vertical"
+            android:layout_rowSpan="2"
             android:layout_marginTop="@dimen/attribute_margin"
             android:layout_row="1" />
+
+    </GridLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/newbill_date"
+            android:layout_width="130dp"
+            android:layout_height="wrap_content"
+            android:gravity="center|left"
+            android:background="@drawable/button_transition_grey_300"
+            android:textColor="@android:color/black"
+            android:text="@string/date"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_column="0"
-            android:layout_row="2"
-            android:layout_marginTop="@dimen/attribute_margin"
+            android:layout_marginLeft="@dimen/attribute_margin"
+            android:layout_marginStart="@dimen/attribute_margin"
             android:text="@string/currency" />
 
         <Spinner
             android:id="@+id/newbill_currency"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="fill_horizontal"
-            android:layout_marginTop="@dimen/attribute_margin"
-            android:layout_column="1"
-            android:layout_row="2" />
-    </GridLayout>
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content" />
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/items" />
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -126,9 +130,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:layout_marginTop="@dimen/attribute_margin"
             android:layout_marginRight="@dimen/attribute_margin"
-            android:text="@string/add_item"
-            android:background="@color/primaryColorLight"
+            android:text="@string/add_item_manually"
+            android:background="@drawable/button_transition_indigo"
             android:textColor="@android:color/white" />
 
         <Button
@@ -136,12 +141,20 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:layout_marginTop="@dimen/attribute_margin"
             android:layout_marginLeft="@dimen/attribute_margin"
-            android:text="@string/select_photo"
-            android:background="@color/primaryColorDark"
+            android:text="@string/add_items_by_photo"
+            android:background="@drawable/button_transition_blue"
             android:textColor="@android:color/white" />
 
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/newbill_items"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/attribute_margin"
+        android:text="@string/items" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/item_list"

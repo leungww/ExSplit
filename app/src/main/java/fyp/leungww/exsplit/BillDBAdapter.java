@@ -42,7 +42,6 @@ public class BillDBAdapter {
         }else{
             SQLiteDatabase itemDB = itemDBHelper.getWritableDatabase();
             SQLiteDatabase itemSplitDB = itemSplitDBHelper.getWritableDatabase();
-
             SQLiteDatabase paymentDB = paymentDBHelper.getWritableDatabase();
 
             itemDB.beginTransaction();
@@ -118,6 +117,7 @@ public class BillDBAdapter {
             }
         }
         cursor.close();
+        billDB.close();
 
         String[] item_columns = {ItemDBHelper.PRIMARY_KEY, ItemDBHelper.NAME, ItemDBHelper.PRICE};
         String item_selection = ItemDBHelper.BILL+" =?";

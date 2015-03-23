@@ -10,6 +10,7 @@ import com.google.android.gms.analytics.Tracker;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 
 public class ExSplitApplication extends Application {
     public static final String SHARED_PREF_FILE_USER_INFO="user";
@@ -43,4 +44,5 @@ public class ExSplitApplication extends Application {
     public void setSelectedTravellers(List<GraphUser> selectedTravellers) {
         this.selectedTravellers = selectedTravellers;
     }
+
 }

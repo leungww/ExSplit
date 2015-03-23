@@ -3,9 +3,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
     tools:context="fyp.leungww.exsplit.EditItemActivity">
 
@@ -19,123 +16,129 @@
 
     </RelativeLayout>
 
-    <GridLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:columnCount="2"
-        android:orientation="horizontal"
-        android:rowCount="1">
+        android:layout_height="fill_parent"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:orientation="vertical">
 
-        <EditText
-            android:id="@+id/edititem_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_column="0"
-            android:layout_gravity="fill_horizontal"
-            android:layout_marginTop="@dimen/attribute_margin"
-            android:layout_row="0"
-            android:gravity="center"
-            android:hint="@string/item_name"
-            android:inputType="textCapSentences"
-            android:maxLength="29"
-            android:singleLine="true"
-            android:textColorHint="@color/hintColor" />
-
-        <Button
-            android:id="@+id/edititem_update"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_column="1"
-            android:layout_marginTop="@dimen/attribute_margin"
-            android:layout_row="0"
-            android:background="@color/primaryColorLight"
-            android:text="@string/update"
-            android:textColor="@android:color/white" />
-
-
-    </GridLayout>
-
-    <GridLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:columnCount="2"
-        android:orientation="horizontal"
-        android:rowCount="2">
-
-        <TextView
-            android:id="@+id/edititem_currency"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_column="0"
-            android:layout_row="0"
-            android:text="@string/price" />
-
-        <EditText
-            android:id="@+id/edititem_price"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_column="1"
-            android:layout_gravity="fill_horizontal"
-            android:layout_row="0"
-            android:digits="0123456789.-"
-            android:gravity="center"
-            android:inputType="numberDecimal|numberSigned"
-            android:maxLength="15"
-            android:singleLine="true" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_column="0"
-            android:layout_row="1"
-            android:text="@string/way_of_splitting" />
-
-        <RadioGroup
-            android:id="@+id/edititem_split_way"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_column="1"
-            android:layout_row="1"
-            android:orientation="horizontal">
-
-            <RadioButton
-                android:id="@+id/edititem_even_split"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/even_split" />
-
-            <RadioButton
-                android:id="@+id/edititem_by_amount"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checked="true"
-                android:text="@string/by_amount" />
-        </RadioGroup>
-
-    </GridLayout>
-
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:isScrollContainer="false">
-
-        <LinearLayout
-            android:id="@+id/edititem_split_details"
+        <GridLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"></LinearLayout>
-    </ScrollView>
+            android:columnCount="2"
+            android:orientation="horizontal"
+            android:rowCount="1">
 
-    <Button
-        android:id="@+id/edititem_delete"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/attribute_margin"
-        android:layout_marginLeft="@dimen/button_margin"
-        android:layout_marginRight="@dimen/button_margin"
-        android:background="@color/primaryColorDark"
-        android:text="@string/delete"
-        android:textColor="@android:color/white" />
+            <EditText
+                android:id="@+id/edititem_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_column="0"
+                android:layout_gravity="fill_horizontal"
+                android:layout_marginTop="@dimen/attribute_margin"
+                android:layout_row="0"
+                android:hint="@string/item_name"
+                android:inputType="textCapSentences"
+                android:maxLength="22"
+                android:singleLine="true"
+                android:textColorHint="@color/hintColor" />
+
+            <Button
+                android:id="@+id/edititem_update"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_column="1"
+                android:layout_marginTop="@dimen/attribute_margin"
+                android:layout_row="0"
+                android:background="@drawable/button_transition_accent_color"
+                android:text="@string/update"
+                android:textColor="@android:color/white" />
+
+
+        </GridLayout>
+
+        <GridLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:columnCount="2"
+            android:orientation="horizontal"
+            android:rowCount="2">
+
+            <TextView
+                android:id="@+id/edititem_currency"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_column="0"
+                android:layout_row="0"
+                android:text="@string/price" />
+
+            <EditText
+                android:id="@+id/edititem_price"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_column="1"
+                android:layout_gravity="fill_horizontal"
+                android:layout_row="0"
+                android:digits="0123456789.-"
+                android:gravity="center"
+                android:inputType="numberDecimal|numberSigned"
+                android:maxLength="15"
+                android:singleLine="true" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_column="0"
+                android:layout_row="1"
+                android:text="@string/way_of_splitting" />
+
+            <RadioGroup
+                android:id="@+id/edititem_split_way"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_column="1"
+                android:layout_row="1"
+                android:orientation="horizontal">
+
+                <RadioButton
+                    android:id="@+id/edititem_even_split"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/even_split" />
+
+                <RadioButton
+                    android:id="@+id/edititem_by_amount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    android:text="@string/by_amount" />
+            </RadioGroup>
+
+        </GridLayout>
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:isScrollContainer="false">
+
+            <LinearLayout
+                android:id="@+id/edititem_split_details"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"></LinearLayout>
+        </ScrollView>
+
+        <Button
+            android:id="@+id/edititem_delete"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/attribute_margin"
+            android:background="@drawable/button_transition_indigo"
+            android:text="@string/delete"
+            android:textColor="@android:color/white" />
+
+    </LinearLayout>
 
 </LinearLayout>

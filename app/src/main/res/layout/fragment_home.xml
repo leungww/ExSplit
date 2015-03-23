@@ -2,6 +2,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
     android:orientation="vertical"
     tools:context="fyp.leungww.exsplit.HomeFragment">
 
@@ -10,13 +12,13 @@
         android:layout_height="?attr/actionBarSize" />
 
     <TextView
+        android:id="@+id/home_activity_log"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/attribute_margin"
-        android:gravity="center"
+        android:layout_marginTop="@dimen/attribute_button_space"
         android:text="@string/activity_log"
         android:textColor="@color/primaryColor"
-        android:textSize="18sp" />
+        android:textSize="22sp" />
 
     <ScrollView
         android:layout_width="match_parent"

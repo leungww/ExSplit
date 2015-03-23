@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 
 public class AddItemActivity extends ActionBarActivity {
@@ -38,6 +39,7 @@ public class AddItemActivity extends ActionBarActivity {
     private LinearLayout newitem_split_details;
     private Button newitem_add;
     private EditText newitem_name, newitem_price;
+    private View even_split_helper_row;
 
     private List<CheckBox> checkBoxes;
     private List<EditText> editTexts;
@@ -79,7 +81,6 @@ public class AddItemActivity extends ActionBarActivity {
             CheckBox checkBox = (CheckBox) even_split_row.findViewById(R.id.traveller_name);
             checkBoxes.add(checkBox);
             checkBox.setText(name);
-            //checkBox.setChecked(true);
             even_split_rows.add(even_split_row);
 
             View by_amount_row = inflater.inflate(R.layout.by_amount_row, null);
@@ -89,12 +90,34 @@ public class AddItemActivity extends ActionBarActivity {
             editTexts.add(traveller_amount);
             by_amount_rows.add(by_amount_row);
         }
+        even_split_helper_row= inflater.inflate(R.layout.even_split_helper_row, null);
+        Button even_split_select_all = (Button) even_split_helper_row.findViewById(R.id.even_split_select_all);
+        even_split_select_all.setOnClickListener(new View.OnClickListener(){
+
+            @Override
+            public void onClick(View v) {
+                for(CheckBox checkBox:checkBoxes){
+                    checkBox.setChecked(true);
+                }
+            }
+        });
+        Button even_split_deselect_all = (Button) even_split_helper_row.findViewById(R.id.even_split_deselect_all);
+        even_split_deselect_all.setOnClickListener(new View.OnClickListener(){
+
+            @Override
+            public void onClick(View v) {
+                for(CheckBox checkBox:checkBoxes){
+                    checkBox.setChecked(false);
+                }
+            }
+        });
         newitem_split_way.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener(){
 
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
                 newitem_split_details.removeAllViews();
                 if(checkedId == R.id.newitem_even_split){
+                    newitem_split_details.addView(even_split_helper_row);
                     for(View even_split_row:even_split_rows){
                         newitem_split_details.addView(even_split_row);
                     }
@@ -168,7 +191,8 @@ public class AddItemActivity extends ActionBarActivity {
                             amounts.put(traveller_id, evenAmount);
                         }
                         //Last traveller takes the rounding remains
-                        amounts.put(travellers_even_split.get(travellers_even_split.size()-1), lastAmount);
+                        Random random = new Random();
+                        amounts.put(travellers_even_split.get(random.nextInt(travellers_even_split.size())), lastAmount);
                         List<String> names_amounts = new ArrayList<>();
                         for(int i=0;i<names.size()-1;i++){
                             names_amounts.add(names.get(i)+" ("+evenAmount+")");

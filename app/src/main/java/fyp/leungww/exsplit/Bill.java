@@ -19,10 +19,6 @@ public class Bill {
     private double total;
     private List<Bill.Item> items;
 
-    public String getDescription() {
-        return description;
-    }
-
     public Bill(long _id, long trip, String description, String createdDate, String category, String currency, double total) throws ParseException {
         this._id = _id;
         this.trip = trip;
@@ -32,6 +28,34 @@ public class Bill {
         this.currency = currency;
         this.total = total;
         this.items = new ArrayList<>();
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public Date getCreatedDate(){
+        return createdDate;
+    }
+
+    public String getCategory(){
+        return category;
+    }
+
+    public long getTrip(){
+        return trip;
+    }
+
+    public String getCurrency(){
+        return currency;
+    }
+
+    public double getTotal(){
+        return total;
+    }
+
+    public List<Bill.Item> getItems(){
+        return items;
     }
 
     public void addItems(List<String> names, List<Double> prices, List<Map<Long, Double>> amountsList){

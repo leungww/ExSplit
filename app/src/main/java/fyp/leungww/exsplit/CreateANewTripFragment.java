@@ -72,6 +72,7 @@ public class CreateANewTripFragment extends Fragment {
     private GraphUser theUser;
     private List<GraphUser> selection;
     private CheckBox newtrip_canada, newtrip_europe, newtrip_uk, newtrip_us;
+    private TextView newtrip_travellers;
 
     private TravellerDBAdapter travellerDBAdapter;
     private AccountDBAdapter accountDBAdapter;
@@ -100,9 +101,6 @@ public class CreateANewTripFragment extends Fragment {
         this.inflater = inflater;
         View view = inflater.inflate(R.layout.fragment_create_a_new_trip, container, false);
         newtrip_name = (EditText) view.findViewById(R.id.newtrip_name);
-        InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(
-                Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(newtrip_name.getWindowToken(), 0);
         newtrip_from = (Button) view.findViewById(R.id.newtrip_from);
         newtrip_from.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -117,10 +115,14 @@ public class CreateANewTripFragment extends Fragment {
                 showDatePickerDialog(v);
             }
         });
+        fromDate = null;
+        toDate = null;
         newtrip_canada = (CheckBox) view.findViewById(R.id.newtrip_canada);
         newtrip_europe = (CheckBox) view.findViewById(R.id.newtrip_europe);
         newtrip_uk = (CheckBox) view.findViewById(R.id.newtrip_uk);
         newtrip_us = (CheckBox) view.findViewById(R.id.newtrip_us);
+        newtrip_travellers = (TextView) view.findViewById(R.id.newtrip_travellers);
+        newtrip_travellers.setVisibility(View.INVISIBLE);
         Button newtrip_add_travellers = (Button) view.findViewById(R.id.newtrip_add_travellers);
         newtrip_add_travellers.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -128,12 +130,14 @@ public class CreateANewTripFragment extends Fragment {
                 onClickAddTraveller();
             }
         });
+        ExSplitApplication application = (ExSplitApplication) getActivity().getApplication();
+        application.setSelectedTravellers(new ArrayList<GraphUser>());
+        newtrip_traveller_list = (LinearLayout) view.findViewById(R.id.newtrip_traveller_list);
         Session session = Session.getActiveSession();
         if (session != null && session.isOpened()) {
             // Get the user's data
             makeMeRequest(session);
         }
-        newtrip_traveller_list = (LinearLayout) view.findViewById(R.id.newtrip_traveller_list);
         Button newtrip_save = (Button) view.findViewById(R.id.newtrip_save);
         newtrip_save.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -145,6 +149,18 @@ public class CreateANewTripFragment extends Fragment {
         accountDBAdapter = new AccountDBAdapter(getActivity());
         tripDBAdapter = new TripDBAdapter(getActivity());
         activityDBAdapter = new ActivityDBAdapter(getActivity());
+
+        /*SharedPreferences sharedPreferences=getActivity().getSharedPreferences(ExSplitApplication.SHARED_PREF_FILE_USER_INFO, Context.MODE_PRIVATE);
+        long user_id = sharedPreferences.getLong(ExSplitApplication.SHARED_PREF_KEY_USER_ID,-1);
+        if(user_id > 0){
+            Traveller user = travellerDBAdapter.getTraveller(user_id);
+            View traveller_row = inflater.inflate(R.layout.traveller_row, null);
+            ProfilePictureView fb_profile_picture = (ProfilePictureView) traveller_row.findViewById(R.id.fb_profile_picture);
+            TextView fb_profile_username = (TextView) traveller_row.findViewById(R.id.fb_profile_username);
+            fb_profile_picture.setProfileId(user.getFbUserId());
+            fb_profile_username.setText(user.getName() + " (" + getString(R.string.you) + ")");
+            newtrip_traveller_list.addView(traveller_row);
+        }*/
         return view;
     }
 
@@ -154,14 +170,14 @@ public class CreateANewTripFragment extends Fragment {
         if(name.length() == 0){
             errors.add("Trip name is empty");
         }
-        if(fromDate == null){
-            errors.add("Start date is not selected");
+        if(fromDate == null || fromDate.length() <= 0){
+            errors.add(getString(R.string.departure_date)+" is not selected");
         }
-        if (toDate == null){
-            errors.add("End date is not selected");
+        if (toDate == null || toDate.length() <= 0){
+            errors.add(getString(R.string.return_date)+" is not selected");
         }
-        if(fromDate != null && toDate != null && fromDate.compareTo(toDate) >=0){
-            errors.add("Start date is after or same as end date");
+        if(fromDate != null && toDate != null && fromDate.length() > 0 && toDate.length() > 0 && fromDate.compareTo(toDate) > 0){
+            errors.add(getString(R.string.departure_date)+" is after return");
         }
         if (!newtrip_canada.isChecked() && !newtrip_europe.isChecked() && !newtrip_uk.isChecked() && !newtrip_us.isChecked()){
             errors.add("No country is checked");
@@ -359,7 +375,7 @@ public class CreateANewTripFragment extends Fragment {
             builder.setNegativeButton(R.string.cancel,new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    getActivity().finish();
+                    dialog.dismiss();
                 }
             });
             builder.show();
@@ -374,7 +390,12 @@ public class CreateANewTripFragment extends Fragment {
         if(resultCode == Activity.RESULT_OK){
             ExSplitApplication application = (ExSplitApplication) getActivity().getApplication();
             selection = application.getSelectedTravellers();
-            if (selection != null && theUser != null) {
+            if(selection != null && selection.isEmpty()){
+                newtrip_travellers.setVisibility(View.INVISIBLE);
+                newtrip_traveller_list.setVisibility(View.INVISIBLE);
+            }else if (selection != null && theUser != null) {
+                newtrip_travellers.setVisibility(View.VISIBLE);
+                newtrip_traveller_list.setVisibility(View.VISIBLE);
                 for (GraphUser traveller : selection) {
                     View traveller_row = inflater.inflate(R.layout.traveller_row, null);
                     ProfilePictureView fb_profile_picture = (ProfilePictureView) traveller_row.findViewById(R.id.fb_profile_picture);
@@ -442,7 +463,8 @@ public class CreateANewTripFragment extends Fragment {
     public static class FromDatePickerFragment extends DatePickerFragment{
         @Override
         public void onDateSet(DatePicker view, int year, int month, int day) {
-            newtrip_from.setBackgroundColor(Color.WHITE);
+            newtrip_from.setBackground(getResources().getDrawable(R.drawable.button_transition_white));
+            //newtrip_from.setBackgroundColor(Color.WHITE);
             Calendar from = Calendar.getInstance();
             from.set(year, month, day);
             String date = new SimpleDateFormat("dd-MMM-yyyy").format(from.getTime());
@@ -454,7 +476,8 @@ public class CreateANewTripFragment extends Fragment {
     public static class ToDatePickerFragment extends DatePickerFragment{
         @Override
         public void onDateSet(DatePicker view, int year, int month, int day) {
-            newtrip_to.setBackgroundColor(Color.WHITE);
+            newtrip_to.setBackground(getResources().getDrawable(R.drawable.button_transition_white));
+            //newtrip_to.setBackgroundColor(Color.WHITE);
             Calendar to = Calendar.getInstance();
             to.set(year, month, day);
             String date = new SimpleDateFormat("dd-MMM-yyyy").format(to.getTime());

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
+
+    <Button
+        android:id="@+id/even_split_select_all"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_marginTop="@dimen/attribute_margin"
+        android:layout_marginRight="@dimen/attribute_margin"
+        android:layout_marginEnd="@dimen/attribute_margin"
+        android:text="@string/select_all"
+        android:background="@drawable/button_transition_indigo"
+        android:textColor="@android:color/white" />
+
+    <Button
+        android:id="@+id/even_split_deselect_all"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_marginTop="@dimen/attribute_margin"
+        android:layout_marginLeft="@dimen/attribute_margin"
+        android:layout_marginStart="@dimen/attribute_margin"
+        android:text="@string/deselect_all"
+        android:background="@drawable/button_transition_blue"
+        android:textColor="@android:color/white" />
+
+</LinearLayout>

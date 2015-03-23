@@ -4,9 +4,6 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="fyp.leungww.exsplit.TheBillActivity">
 
     <RelativeLayout
@@ -19,13 +16,153 @@
 
     </RelativeLayout>
 
-    <TextView
-        android:id="@+id/thebill_description"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/attribute_margin"
-        android:gravity="center"
-        android:textColor="@color/primaryColor"
-        android:textSize="18sp" />
+        android:layout_height="fill_parent"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/thebill_date"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/attribute_margin"
+            android:text="@string/date"/>
+
+        <TextView
+            android:id="@+id/thebill_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/primaryColor"
+            android:textSize="22sp"
+            android:text="@string/bill_description"/>
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:isScrollContainer="false">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/thebill_category"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="end"
+                    android:layout_marginTop="@dimen/attribute_margin"
+                    android:text="@string/category"/>
+
+                <TextView
+                    android:id="@+id/thebill_trip"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="end"
+                    android:text="@string/shared_between_travellers_in"/>
+
+                <GridLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:rowCount="1"
+                    android:columnCount="2"
+                    android:orientation="horizontal">
+                    <TextView
+                        android:id="@+id/thebill_total_string"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="fill_horizontal"
+                        android:gravity="end"
+                        android:layout_row="0"
+                        android:layout_column="0"
+                        android:text="@string/total"/>
+
+                    <TextView
+                        android:id="@+id/thebill_total"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="@dimen/attribute_margin"
+                        android:layout_marginStart="@dimen/attribute_margin"
+                        android:layout_row="0"
+                        android:layout_column="1"
+                        android:textSize="18sp"/>
+
+                </GridLayout>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/attribute_margin"
+                    android:text="@string/items"/>
+
+                <LinearLayout
+                    android:id="@+id/thebill_item_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/attribute_button_space"
+                    android:background="@drawable/item_border"/>
+
+                <GridLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:rowCount="2"
+                    android:columnCount="2"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/thebill_subtotal_string"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="fill_horizontal"
+                        android:gravity="end"
+                        android:layout_row="0"
+                        android:layout_column="0"
+                        android:text="@string/your_subtotal"/>
+
+                    <TextView
+                        android:id="@+id/thebill_subtotal"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="@dimen/attribute_margin"
+                        android:layout_marginStart="@dimen/attribute_margin"
+                        android:layout_row="0"
+                        android:layout_column="1"
+                        android:textSize="18sp"/>
+
+                    <TextView
+                        android:id="@+id/thebill_paid_out_string"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="fill_horizontal"
+                        android:gravity="end"
+                        android:layout_row="1"
+                        android:layout_column="0"
+                        android:text="@string/your_paid_out"/>
+
+                    <TextView
+                        android:id="@+id/thebill_paid_out"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="@dimen/attribute_margin"
+                        android:layout_marginStart="@dimen/attribute_margin"
+                        android:layout_row="1"
+                        android:layout_column="1"
+                        android:textSize="18sp"/>
+
+                </GridLayout>
+
+            </LinearLayout>
+        </ScrollView>
+
+    </LinearLayout>
 
 </LinearLayout>

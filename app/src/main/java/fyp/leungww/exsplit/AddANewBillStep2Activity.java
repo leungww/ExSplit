@@ -68,7 +68,7 @@ public class AddANewBillStep2Activity extends ActionBarActivity {
             TextView textView_name = (TextView) traveller_amounts_row.findViewById(R.id.traveller_name);
             textView_name.setText(travellers_name.get(index));
             EditText editText = (EditText) traveller_amounts_row.findViewById(R.id.traveller_paid);
-            editText.setText(travellers_amount.get(index)+"");
+            //editText.setText(travellers_amount.get(index)+"");
             TextView textView_needed = (TextView) traveller_amounts_row.findViewById(R.id.traveller_needed);
             textView_needed.setText(getString(R.string.needs)+" "+travellers_amount.get(index));
             editTexts.add(editText);

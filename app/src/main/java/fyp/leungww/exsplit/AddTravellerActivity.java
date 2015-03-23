@@ -81,9 +81,9 @@ public class AddTravellerActivity extends FragmentActivity {
 
     private void onError(Exception error) {
         String text = getString(R.string.exception, error.getMessage());
-        Toast toast = Toast.makeText(this, text, Toast.LENGTH_SHORT);
+        Toast toast = Toast.makeText(this, "Errors occured in friend picker, please try again later", Toast.LENGTH_SHORT);
         toast.show();
-        setResult(RESULT_FIRST_USER, null);
+        setResult(RESULT_CANCELED, null);
         finish();
     }
 

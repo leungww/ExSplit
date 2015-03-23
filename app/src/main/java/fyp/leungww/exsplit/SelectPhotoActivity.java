@@ -1,11 +1,15 @@
 package fyp.leungww.exsplit;
 
+import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.AssetManager;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.media.ExifInterface;
 import android.net.Uri;
@@ -20,6 +24,7 @@ import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -29,6 +34,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.facebook.Session;
 import com.googlecode.leptonica.android.Binarize;
 import com.googlecode.leptonica.android.Convert;
 import com.googlecode.leptonica.android.Pix;
@@ -47,6 +53,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -62,11 +69,11 @@ public class SelectPhotoActivity extends ActionBarActivity {
     public static final String LANGUAGE_ENGLISH="eng";
 
     private final String language = "eng";
-    private Button selectphoto_camera, selectphoto_gallery, selectphoto_add;
+    private Button selectphoto_camera, selectphoto_gallery;
+    private TextView selectphoto_recognised_text_text, selectphoto_recognised_text_note;
     private EditText selectphoto_recognised_text;
     private LinearLayout selectphoto_item_list;
-    private String photoPath;
-    private File cameraFile;
+    private String photoPath ,croppedPhotoPath;
 
     private String currencyCodeSymbol;
     private List<Long> travellers_id;
@@ -100,17 +107,22 @@ public class SelectPhotoActivity extends ActionBarActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 if (intent.resolveActivity(getPackageManager()) != null) {
-                    try {
-                        cameraFile = createPhotoFile();
-                        intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(cameraFile));
-                        intent.putExtra("scale", true);
-                        intent.putExtra("return-data", false);
-                        intent.putExtra("noFaceDetection", true);
-                        startActivityForResult(intent, CAMERA_REQUEST_CODE);
-                    } catch (IOException e) {
-                        Toast toast = Toast.makeText(getApplicationContext(), "Error occured while creating image file", Toast.LENGTH_SHORT);
-                        toast.show();
-                    }
+                    AlertDialog.Builder builder = new AlertDialog.Builder(SelectPhotoActivity.this);
+                    builder.setTitle(R.string.hint);
+                    builder.setMessage(R.string.hint_camera);
+                    builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            startCamera();
+                        }
+                    });
+                    builder.setNegativeButton(R.string.cancel,new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+                    builder.show();
                 }
             }
         });
@@ -132,8 +144,10 @@ public class SelectPhotoActivity extends ActionBarActivity {
         });
 
         selectphoto_item_list = (LinearLayout) findViewById(R.id.selectphoto_item_list);
+        selectphoto_recognised_text_text = (TextView) findViewById(R.id.selectphoto_recognised_text_text);
+        selectphoto_recognised_text_note = (TextView) findViewById(R.id.selectphoto_recognised_text_note);
         selectphoto_recognised_text = (EditText) findViewById(R.id.selectphoto_recognised_text);
-        selectphoto_recognised_text.setHint(getString(R.string.item_name)+"  "+getString(R.string.price)+" ("+currencyCodeSymbol+")");
+        selectphoto_recognised_text.setHint(getString(R.string.item_name)+"  "+getString(R.string.price)+" ("+currencyCodeSymbol+")"+"\n"+getString(R.string.example_recognised_text));
         selectphoto_recognised_text.addTextChangedListener(new TextWatcher(){
 
             @Override
@@ -151,14 +165,25 @@ public class SelectPhotoActivity extends ActionBarActivity {
                 extractItems(s.toString());
             }
         });
-        selectphoto_add = (Button) findViewById(R.id.selectphoto_add);
-        selectphoto_add.setOnClickListener(new View.OnClickListener(){
+        selectphoto_recognised_text_text.setVisibility(View.INVISIBLE);
+        selectphoto_recognised_text_note.setVisibility(View.INVISIBLE);
+        selectphoto_recognised_text.setVisibility(View.INVISIBLE);
+    }
 
-            @Override
-            public void onClick(View v) {
-                addItems();
-            }
-        });
+    private void startCamera(){
+        try {
+            Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            createPhotoFile();
+            File cameraFile = new File(photoPath);
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(cameraFile));
+            intent.putExtra("scale", true);
+            intent.putExtra("return-data", false);
+            intent.putExtra("noFaceDetection", true);
+            startActivityForResult(intent, CAMERA_REQUEST_CODE);
+        } catch (IOException e) {
+            Toast toast = Toast.makeText(getApplicationContext(), "Error occurred while creating image file", Toast.LENGTH_SHORT);
+            toast.show();
+        }
     }
 
     private void addItems(){
@@ -176,16 +201,19 @@ public class SelectPhotoActivity extends ActionBarActivity {
                 double evenAmount = evenAmountBD.doubleValue();
                 BigDecimal lastAmountBD = priceBD.subtract(evenAmountBD.multiply(sizeBD.subtract(BigDecimal.ONE)));
                 double lastAmount = lastAmountBD.doubleValue();
-                for(int i=0;i<travellers_id.size()-1;i++){
+
+                Random random = new Random();
+                int lastAmountIndex = random.nextInt(travellers_id.size());
+                for(int i=0;i<travellers_id.size();i++){
                     amounts.add(evenAmount);
                 }
                 //Last traveller takes the rounding remains
-                amounts.add(lastAmount);
+                amounts.set(lastAmountIndex,lastAmount);
                 List<String> names_amounts = new ArrayList<>();
-                for(int i=0;i<travellers_name.size()-1;i++){
+                for(int i=0;i<travellers_name.size();i++){
                     names_amounts.add(travellers_name.get(i)+" ("+evenAmount+")");
                 }
-                names_amounts.add(travellers_name.get(travellers_name.size()-1)+" ("+lastAmount+")");
+                names_amounts.set(lastAmountIndex, travellers_name.get(lastAmountIndex)+" ("+lastAmount+")");
                 String amounts_string = TextUtils.join(", ", names_amounts);
                 items_amounts.add(amounts);
                 items_amounts_string.add(amounts_string);
@@ -204,19 +232,58 @@ public class SelectPhotoActivity extends ActionBarActivity {
         switch (requestCode) {
             case (CAMERA_REQUEST_CODE):
                 if (resultCode == RESULT_OK) {
-                    Intent intent = getCropIntent();
-                    intent.setDataAndType(Uri.fromFile(cameraFile), "image/*");
-                    startActivityForResult(intent, CROP_PHOTO_REQUEST_CODE);
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setTitle(R.string.hint);
+                    builder.setMessage(R.string.hint_crop);
+                    builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            File cameraFile = new File(photoPath);
+                            Intent intent = getCropIntent();
+                            intent.setDataAndType(Uri.fromFile(cameraFile), "image/*");
+                            startActivityForResult(intent, CROP_PHOTO_REQUEST_CODE);
+                        }
+                    });
+                    builder.setNegativeButton(R.string.cancel,new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            OCRPhoto ocr = new OCRPhoto();
+                            ocr.execute(photoPath);
+                            dialog.dismiss();
+                        }
+                    });
+                    builder.show();
+
                 }else if(resultCode == RESULT_CANCELED){
+                    File cameraFile = new File(photoPath);
                     cameraFile.delete();
                 }
                 break;
             case (GALLERY_REQUEST_CODE):
                 if (resultCode == RESULT_OK) {
-                    Intent intent = getCropIntent();
-                    Uri selectedImage = data.getData();
-                    intent.setDataAndType(selectedImage, "image/*");
-                    startActivityForResult(intent, CROP_PHOTO_REQUEST_CODE);
+                    final Uri selectedImage = data.getData();
+                    photoPath = getRealPathFromURI(selectedImage);
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setTitle(R.string.hint);
+                    builder.setMessage(R.string.hint_crop);
+                    builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Intent intent = getCropIntent();
+                            intent.setDataAndType(selectedImage, "image/*");
+                            startActivityForResult(intent, CROP_PHOTO_REQUEST_CODE);
+                        }
+                    });
+                    builder.setNegativeButton(R.string.cancel,new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            OCRPhoto ocr = new OCRPhoto();
+                            ocr.execute(photoPath);
+                            dialog.dismiss();
+                        }
+                    });
+                    builder.show();
                     /*if (data == null) {
                         Log.i("SelectPhoto", "Null data, but RESULT_OK, from image picker!");
                         Toast.makeText(this, "No photo was selected", Toast.LENGTH_SHORT).show();
@@ -237,16 +304,33 @@ public class SelectPhotoActivity extends ActionBarActivity {
             case CROP_PHOTO_REQUEST_CODE:
                 if (resultCode == RESULT_OK) {
                     Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-                    intent.setData(getPhotoUri());
+                    intent.setData(getCroppedPhotoUri());
                     this.sendBroadcast(intent);
 
                     //final Bundle extras = data.getExtras();
                     //Bitmap receipt = extras.getParcelable("data");
                     OCRPhoto ocr = new OCRPhoto();
+                    ocr.execute(croppedPhotoPath);
+                }else if(resultCode == RESULT_CANCELED){
+                    OCRPhoto ocr = new OCRPhoto();
                     ocr.execute(photoPath);
                 }
                 break;
         }
+    }
+
+    private String getRealPathFromURI(Uri uri) {
+        String result;
+        Cursor cursor = getContentResolver().query(uri, null, null, null, null);
+        if (cursor == null) {
+            result = uri.getPath();
+        } else {
+            cursor.moveToFirst();
+            int index = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
+            result = cursor.getString(index);
+            cursor.close();
+        }
+        return result;
     }
 
     private Intent getCropIntent(){
@@ -256,24 +340,28 @@ public class SelectPhotoActivity extends ActionBarActivity {
         intent.putExtra("aspectY", 0);
         intent.putExtra("scale", true);
         intent.putExtra("return-data", false);
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, getPhotoUri());
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, getCroppedPhotoUri());
         //intent.putExtra("outputFormat", Bitmap.CompressFormat.JPEG.toString());
         intent.putExtra("noFaceDetection", true);
 
         return intent;
     }
 
-    private File createPhotoFile() throws IOException {
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String fileName = "Receipt_" + timeStamp;
+    private void createPhotoFile() throws IOException {
         String directoryPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).toString()+"/Camera/";
         File directory = new File(directoryPath);
-        return File.createTempFile(fileName, ".jpg", directory);
+        if (!directory.exists()) {
+            if (!directory.mkdirs()) {
+                throw new IOException("Directory "+directoryPath+" cannot be created");
+            }
+        }
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        photoPath = directoryPath + "/Receipt_" + timeStamp + ".jpg";
     }
 
-    private Uri getPhotoUri(){
-        photoPath = DIRECTORY_PATH + "/receipt_cropped.jpg";
-        File file = new File(DIRECTORY_PATH + "/receipt_cropped.jpg");
+    private Uri getCroppedPhotoUri(){
+        croppedPhotoPath = DIRECTORY_PATH + "/receipt_cropped.jpg";
+        File file = new File(croppedPhotoPath);
         return Uri.fromFile(file);
     }
 
@@ -329,23 +417,46 @@ public class SelectPhotoActivity extends ActionBarActivity {
                 }
             }
         }
-        if(item_rows_evenSplit.size()>0){
-            TextView note_invalid_items = new TextView(SelectPhotoActivity.this);
-            note_invalid_items.setTextColor(getResources().getColor(R.color.primaryColorDark));
-            note_invalid_items.setText(getString(R.string.note_items_even_split));
-            selectphoto_item_list.addView(note_invalid_items);
-            for(View item_row:item_rows_evenSplit){
-                selectphoto_item_list.addView(item_row);
+        if(item_rows_evenSplit.size() >0 || item_rows_byAmount.size() >0){
+            TextView selectphoto_items = new TextView(this);
+            selectphoto_items.setText(getString(R.string.items));
+            LinearLayout.LayoutParams llp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            llp.setMargins(0, 10, 0, 0);
+            selectphoto_items.setLayoutParams(llp);
+            selectphoto_item_list.addView(selectphoto_items);
+
+            if(item_rows_evenSplit.size()>0){
+                TextView note_invalid_items = new TextView(SelectPhotoActivity.this);
+                note_invalid_items.setTextColor(getResources().getColor(R.color.primaryColorDark));
+                note_invalid_items.setText(getString(R.string.note_items_even_split));
+                selectphoto_item_list.addView(note_invalid_items);
+                for(View item_row:item_rows_evenSplit){
+                    selectphoto_item_list.addView(item_row);
+                }
             }
-        }
-        if(item_rows_byAmount.size()>0){
-            TextView note_invalid_items = new TextView(SelectPhotoActivity.this);
-            note_invalid_items.setTextColor(getResources().getColor(R.color.primaryColorLight));
-            note_invalid_items.setText(getString(R.string.note_items_by_amount));
-            selectphoto_item_list.addView(note_invalid_items);
-            for(View item_row:item_rows_byAmount){
-                selectphoto_item_list.addView(item_row);
+            if(item_rows_byAmount.size()>0){
+                TextView note_invalid_items = new TextView(SelectPhotoActivity.this);
+                note_invalid_items.setTextColor(getResources().getColor(R.color.primaryColorLight));
+                note_invalid_items.setText(getString(R.string.note_items_by_amount));
+                selectphoto_item_list.addView(note_invalid_items);
+                for(View item_row:item_rows_byAmount){
+                    selectphoto_item_list.addView(item_row);
+                }
             }
+
+            Button selectphoto_add = new Button(this);
+            selectphoto_add.setText(R.string.add_all);
+            selectphoto_add.setTextColor(Color.WHITE);
+            selectphoto_add.setBackground(getResources().getDrawable(R.drawable.button_transition_accent_color));
+            selectphoto_add.setLayoutParams(llp);
+            selectphoto_add.setOnClickListener(new View.OnClickListener(){
+
+                @Override
+                public void onClick(View v) {
+                    addItems();
+                }
+            });
+            selectphoto_item_list.addView(selectphoto_add);
         }
 
     }
@@ -377,9 +488,9 @@ public class SelectPhotoActivity extends ActionBarActivity {
             };
 
             for (String path : paths) {
-                File dir = new File(path);
-                if (!dir.exists()) {
-                    if (!dir.mkdirs()) {
+                File directory = new File(path);
+                if (!directory.exists()) {
+                    if (!directory.mkdirs()) {
                         return "Directory "+path+" cannot be created";
                     }
                 }
@@ -487,6 +598,9 @@ public class SelectPhotoActivity extends ActionBarActivity {
         @Override
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
+            selectphoto_recognised_text_text.setVisibility(View.VISIBLE);
+            selectphoto_recognised_text_note.setVisibility(View.VISIBLE);
+            selectphoto_recognised_text.setVisibility(View.VISIBLE);
             selectphoto_recognised_text.setText(result);
             extractItems(result);
         }
